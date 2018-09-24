@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>AzurViewer</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  </head>
+  <body>
+    <p id="item">
+      
+    </p>
+    <script>
+      
+      // An object containing the URL to useful icons.
+      var icons = {
+        "firepower" : "https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png",
+        "health" : "https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png",
+        "anti_air" : "https://azurlane.koumakan.jp/w/images/thumb/0/0f/AntiAir.png/25px-AntiAir.png",
+        "evasion" : "https://azurlane.koumakan.jp/w/images/thumb/d/d2/Evasion.png/25px-Evasion.png",
+        "air_power" : "https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png",
+        "aviation" : "https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png",
+        "torpedo" : "https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png"
+      };
+      
+      /**
+        Gets the index of the nth occurance of a substring in a string.
+        
+        This solution was deprived from StackOverflow, original answer found here:
+        https://stackoverflow.com/a/14482123
+      */
+      function nthIndex(str, pat, n){
+          var L= str.length, i= -1;
+          while(n-- && i++<L){
+              i= str.indexOf(pat, i);
+              if (i < 0) break;
+          }
+          return i;
+      }
+      
+      /**
+        Parses the list of ships given the wikimedia parse data for https://azurlane.koumakan.jp/List_of_Ships.
+      */
+      function parseListOfShips(data){
+        var ships = {};
+        for (var i = 0; i < data.length; i++){
+          if ((i + 1) < data.length){ // Check for out of bounds.
+            if (data[i].includes("td data-sort-value=") && data[i + 1].includes("a href=\"")){
+              // ships[ship name]
+              ships[(data[i + 1].substring(9, nthIndex(data[i + 1], "\"", 2))).replace(/_/g, " ")] = {
+                "hello" : "test"
+              }
+            }
+          }
+        }
+        alert(JSON.stringify(ships));
+      }
+      
+      $.ajax({
+        url: "https://azurlane.koumakan.jp/w/api.php",
+        method: "GET",
+        dataType: "jsonp",
+        data: {
+          action: "parse",
+          page: "List_of_Ships",
+          format: "json"
+        },
+        success: function(data){
+          // text variable contains a fragment of HTML.
+          var text = data['parse']['text']['*'];
+          text = text.split("<");
+          /*
+          
+          Code slice is for testing purposes only. Prints out a big list.
+          
+          text = text.split("<");
+          text.forEach(function(item, index){
+            $("#item").html($("#item").html() + index + " " + item + "<br>");
+          });
+          */
+          
+          var parsedShips = parseListOfShips(text);
+        }
+      });
+    </script>
+  </body>
+</html>
