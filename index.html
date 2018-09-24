@@ -1,12 +1,31 @@
 <!DOCTYPE html>
 
+<!-- 
+
+AzurViewer
+
+[ A web explorer for Azur Lane. Look at detailed ship stats, descriptions and more. ]
+
+-------
+
+What is the license?
+Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0), as stated with Wikimedia-related content unless stated otherwise.
+See link for more details: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+How does it work?
+Essentially, the app scrapes data from the wiki and parses it correctly into an app. This removes the need to rewrite tons and tons of 
+existing information. (phew). Of course, too many requests will flood the wiki, so data is attempted caching into localStorage.
+
+Developed by Chen Zheng (@HotFireyDeath)
+-->
+
 <html>
   <head>
     <title>AzurViewer</title>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   </head>
   <body>
-    <p id="item">
+    <p id="shipItems">
       
     </p>
     <script>
@@ -38,21 +57,60 @@
       }
       
       /**
-        Parses the list of ships given the wikimedia parse data for https://azurlane.koumakan.jp/List_of_Ships.
+        Parses the list of ships given the wikimedia HTML parse data for https://azurlane.koumakan.jp/List_of_Ships.
+        This is hard-coded, and therefore is subject to breaking. Will attempt to update as often as possible.
+        
+        Developed by @HotFireyDeath (Chen Zheng)
+        https://czheng.me
       */
       function parseListOfShips(data){
         var ships = {};
+        
+        // Parse ship's 'top layer' data using List of Ships Azur Wiki result.
         for (var i = 0; i < data.length; i++){
           if ((i + 1) < data.length){ // Check for out of bounds.
-            if (data[i].includes("td data-sort-value=") && data[i + 1].includes("a href=\"")){
-              // ships[ship name]
-              ships[(data[i + 1].substring(9, nthIndex(data[i + 1], "\"", 2))).replace(/_/g, " ")] = {
-                "hello" : "test"
+            if (
+              data[i].includes("td data-sort-value=") && 
+              data[i + 1].includes("a href=\"") && 
+              (isNaN(data[i + 1].substring(data[i + 1].indexOf(">") + 1)) || (parseInt(data[i + 1].substring(data[i + 1].indexOf(">") + 1)) < 3000))
+            ){
+              var shipName = (data[i + 1].substring(9, nthIndex(data[i + 1], "\"", 2))).replace(/_/g, " ");
+              ships[shipName] = {
+                pageLink: "/" + shipName.replace(/ /g, "_"), // Ship Wikimedia page
+                id: data[i + 1].substring(data[i + 1].indexOf(">") + 1), // Ship ID
+                category: data[i + 11].substring(data[i + 11].indexOf(">") + 1),
+                rarity: data[i + 8].substring(data[i + 8].indexOf(">") + 1),
+                affiliation: data[i + 15].substring(data[i + 15].indexOf(">") + 1),
+                firepower_rating: data[i + 18].substring(data[i + 18].indexOf(">") + 1),
+                health_rating: data[i + 20].substring(data[i + 20].indexOf(">") + 1),
+                anti_air_rating: data[i + 22].substring(data[i + 22].indexOf(">") + 1),
+                evasion_rating: data[i + 24].substring(data[i + 24].indexOf(">") + 1),
+                air_power_rating: data[i + 26].substring(data[i + 26].indexOf(">") + 1),
+                torpedo_rating: data[i + 28].substring(data[i + 28].indexOf(">") + 1)
               }
             }
           }
         }
-        alert(JSON.stringify(ships));
+        
+        // Deep search for each ship, grab available stats.
+        for (var shipName in ships){
+          var shipNameTag = ships[shipName]["pageLink"].substring(1);
+          $.ajax({
+            url: "https://azurlane.koumakan.jp/w/api.php",
+            method: "GET",
+            dataType: "jsonp",
+            data: {
+              action: "parse",
+              page: shipNameTag,
+              format: "json"
+            },
+            success: function(data){
+              // TO-DO: Parse deep data for each ship and enter into the ship array.
+            }
+          });
+        }
+        
+        $("#shipItems").text(JSON.stringify(ships));
       }
       
       $.ajax({
