@@ -20,125 +20,146 @@ Developed by Chen Zheng (@HotFireyDeath)
 -->
 
 <html>
-  <head>
-    <title>AzurViewer</title>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  </head>
-  <body>
-    <p id="shipItems">
-      
-    </p>
-    <script>
-      
-      // An object containing the URL to useful icons.
-      var icons = {
-        "firepower" : "https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png",
-        "health" : "https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png",
-        "anti_air" : "https://azurlane.koumakan.jp/w/images/thumb/0/0f/AntiAir.png/25px-AntiAir.png",
-        "evasion" : "https://azurlane.koumakan.jp/w/images/thumb/d/d2/Evasion.png/25px-Evasion.png",
-        "air_power" : "https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png",
-        "aviation" : "https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png",
-        "torpedo" : "https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png"
-      };
-      
-      /**
-        Gets the index of the nth occurance of a substring in a string.
-        
-        This solution was deprived from StackOverflow, original answer found here:
-        https://stackoverflow.com/a/14482123
-      */
-      function nthIndex(str, pat, n){
-          var L= str.length, i= -1;
-          while(n-- && i++<L){
-              i= str.indexOf(pat, i);
-              if (i < 0) break;
-          }
-          return i;
-      }
-      
-      /**
-        Parses the list of ships given the wikimedia HTML parse data for https://azurlane.koumakan.jp/List_of_Ships.
-        This is hard-coded, and therefore is subject to breaking. Will attempt to update as often as possible.
-        
-        Developed by @HotFireyDeath (Chen Zheng)
-        https://czheng.me
-      */
-      function parseListOfShips(data){
-        var ships = {};
-        
-        // Parse ship's 'top layer' data using List of Ships Azur Wiki result.
-        for (var i = 0; i < data.length; i++){
-          if ((i + 1) < data.length){ // Check for out of bounds.
-            if (
-              data[i].includes("td data-sort-value=") && 
-              data[i + 1].includes("a href=\"") && 
-              (isNaN(data[i + 1].substring(data[i + 1].indexOf(">") + 1)) || (parseInt(data[i + 1].substring(data[i + 1].indexOf(">") + 1)) < 3000))
-            ){
-              var shipName = (data[i + 1].substring(9, nthIndex(data[i + 1], "\"", 2))).replace(/_/g, " ");
-              ships[shipName] = {
-                pageLink: "/" + shipName.replace(/ /g, "_"), // Ship Wikimedia page
-                id: data[i + 1].substring(data[i + 1].indexOf(">") + 1), // Ship ID
-                category: data[i + 11].substring(data[i + 11].indexOf(">") + 1),
-                rarity: data[i + 8].substring(data[i + 8].indexOf(">") + 1),
-                affiliation: data[i + 15].substring(data[i + 15].indexOf(">") + 1),
-                firepower_rating: data[i + 18].substring(data[i + 18].indexOf(">") + 1),
-                health_rating: data[i + 20].substring(data[i + 20].indexOf(">") + 1),
-                anti_air_rating: data[i + 22].substring(data[i + 22].indexOf(">") + 1),
-                evasion_rating: data[i + 24].substring(data[i + 24].indexOf(">") + 1),
-                air_power_rating: data[i + 26].substring(data[i + 26].indexOf(">") + 1),
-                torpedo_rating: data[i + 28].substring(data[i + 28].indexOf(">") + 1)
-              }
+    <head>
+        <title>AzurViewer</title>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    </head>
+    <body>
+        <p id="shipItems">
+
+        </p>
+        <br>
+        <p id="temp">
+
+        </p>
+        <script>
+
+            // An object containing the URL to useful icons.
+            var icons = {
+                "firepower": "https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png",
+                "health": "https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png",
+                "anti_air": "https://azurlane.koumakan.jp/w/images/thumb/0/0f/AntiAir.png/25px-AntiAir.png",
+                "evasion": "https://azurlane.koumakan.jp/w/images/thumb/d/d2/Evasion.png/25px-Evasion.png",
+                "air_power": "https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png",
+                "aviation": "https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png",
+                "torpedo": "https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png"
+            };
+
+            /**
+             Gets the index of the nth occurance of a substring in a string.
+
+             This solution was deprived from StackOverflow, original answer found here:
+             https://stackoverflow.com/a/14482123
+             */
+            function nthIndex(str, pat, n) {
+                var L = str.length, i = -1;
+                while (n-- && i++ < L) {
+                    i = str.indexOf(pat, i);
+                    if (i < 0) break;
+                }
+                return i;
             }
-          }
-        }
-        
-        // Deep search for each ship, grab available stats.
-        for (var shipName in ships){
-          var shipNameTag = ships[shipName]["pageLink"].substring(1);
-          $.ajax({
-            url: "https://azurlane.koumakan.jp/w/api.php",
-            method: "GET",
-            dataType: "jsonp",
-            data: {
-              action: "parse",
-              page: shipNameTag,
-              format: "json"
-            },
-            success: function(data){
-              // TO-DO: Parse deep data for each ship and enter into the ship array.
+
+            /**
+             Parses the list of ships given the wikimedia HTML parse data for https://azurlane.koumakan.jp/List_of_Ships.
+             This is hard-coded, and therefore is subject to breaking. Will attempt to update as often as possible.
+
+             Developed by @HotFireyDeath (Chen Zheng)
+             https://czheng.me
+             */
+            function parseListOfShips(data) {
+                var ships = {};
+
+                // Parse ship's 'top layer' data using List of Ships Azur Wiki result.
+                for (var i = 0; i < data.length; i++) {
+                    if ((i + 1) < data.length) { // Check for out of bounds.
+                        if (
+                            data[i].includes("td data-sort-value=") &&
+                            data[i + 1].includes("a href=\"") &&
+                            (isNaN(data[i + 1].substring(data[i + 1].indexOf(">") + 1)) || (parseInt(data[i + 1].substring(data[i + 1].indexOf(">") + 1)) < 3000))
+                        ) {
+                            var shipName = (data[i + 1].substring(9, nthIndex(data[i + 1], "\"", 2))).replace(/_/g, " ");
+                            ships[shipName] = {
+                                pageLink: "/" + shipName.replace(/ /g, "_"), // Ship Wikimedia page
+                                id: data[i + 1].substring(data[i + 1].indexOf(">") + 1), // Ship ID
+                                category: data[i + 11].substring(data[i + 11].indexOf(">") + 1),
+                                rarity: data[i + 8].substring(data[i + 8].indexOf(">") + 1),
+                                affiliation: data[i + 15].substring(data[i + 15].indexOf(">") + 1),
+                                firepower_rating: data[i + 18].substring(data[i + 18].indexOf(">") + 1),
+                                health_rating: data[i + 20].substring(data[i + 20].indexOf(">") + 1),
+                                anti_air_rating: data[i + 22].substring(data[i + 22].indexOf(">") + 1),
+                                evasion_rating: data[i + 24].substring(data[i + 24].indexOf(">") + 1),
+                                air_power_rating: data[i + 26].substring(data[i + 26].indexOf(">") + 1),
+                                torpedo_rating: data[i + 28].substring(data[i + 28].indexOf(">") + 1)
+                            }
+                        }
+                    }
+                }
+
+                var activePings = 0;
+                // Deep search for each ship, grab available stats.
+                for (var name in ships) {
+                    var shipNameTag = ships[name]["pageLink"].substring(1);
+                    activePings++;
+                    $.ajax({
+                        url: "https://azurlane.koumakan.jp/w/api.php",
+                        method: "GET",
+                        dataType: "jsonp",
+                        data: {
+                            action: "parse",
+                            page: shipNameTag,
+                            format: "json"
+                        },
+                        success: function (data) {
+                            // TO-DO: Parse deep data for each ship and enter into the ship array.
+                            // Still bugged :( pages are loading slowly and crashing....
+                            var raw = data["parse"]["text"]["*"];
+                            raw = raw.split("<");
+                            ships[name].type_abbrev = raw[9].substring(5, raw[9].indexOf(name));
+                            ships[name].aka = {
+                                "cn" : raw[9].substring(raw[9].indexOf("(") + 4, raw[9].indexOf(";")),
+                                "jp" : raw[9].substring(raw[9].indexOf(";") + 5, raw[9].indexOf(")") - 1)
+                            };
+                            activePings--;
+                            if (activePings < 1) {
+                                alert("All queries completed.");
+                                render(ships);
+                            }
+                        }
+                    });
+                }
             }
-          });
-        }
-        
-        $("#shipItems").text(JSON.stringify(ships));
-      }
-      
-      $.ajax({
-        url: "https://azurlane.koumakan.jp/w/api.php",
-        method: "GET",
-        dataType: "jsonp",
-        data: {
-          action: "parse",
-          page: "List_of_Ships",
-          format: "json"
-        },
-        success: function(data){
-          // text variable contains a fragment of HTML.
-          var text = data['parse']['text']['*'];
-          text = text.split("<");
-          /*
-          
-          Code slice is for testing purposes only. Prints out a big list.
-          
-          text = text.split("<");
-          text.forEach(function(item, index){
-            $("#item").html($("#item").html() + index + " " + item + "<br>");
-          });
-          */
-          
-          var parsedShips = parseListOfShips(text);
-        }
-      });
-    </script>
-  </body>
+
+            function render(ships){
+                $("#shipItems").text(JSON.stringify(ships));
+            }
+
+            $.ajax({
+                url: "https://azurlane.koumakan.jp/w/api.php",
+                method: "GET",
+                dataType: "jsonp",
+                data: {
+                    action: "parse",
+                    page: "List_of_Ships",
+                    format: "json"
+                },
+                success: function (data) {
+                    // text variable contains a fragment of HTML.
+                    var text = data['parse']['text']['*'];
+                    text = text.split("<");
+                    /*
+
+                    Code slice is for testing purposes only. Prints out a big list.
+
+                    text = text.split("<");
+                    text.forEach(function(item, index){
+                      $("#item").html($("#item").html() + index + " " + item + "<br>");
+                    });
+                    */
+
+                    var parsedShips = parseListOfShips(text);
+                }
+            });
+        </script>
+    </body>
 </html>
