@@ -17,6 +17,9 @@ Developed by Chen Zheng (@HotFireyDeath)
     <head>
         <title>AzurViewer</title>
       
+        <!-- GOOGLE FONTS -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+      
         <!-- JQUERY -->
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
       
@@ -24,9 +27,43 @@ Developed by Chen Zheng (@HotFireyDeath)
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
       
+        <style> body { font-family: "Open Sans", Serif; } </style>
     </head>
     <body>
+      
+        <div id="loading_pleaseWait">
+          <div class="container">
+            <div class="card horizontal">
+              <div class="card-image">
+                <img id="loading_pleaseWait_char" src="https://azurlane.koumakan.jp/w/images/f/fb/SaratogaChibi.png">
+              </div>
+              <div class="card-stacked">
+                <div class="card-content" style="text-align: center;" id="loading_pleaseWait_phrase">
+                  Commander, please wait a moment~
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
         <script>
+          
+            // Set random loading character and 'slogan'.
+            var loadingRandoms = {
+              "https://azurlane.koumakan.jp/w/images/8/86/LaffeyChibi.png" : "Commander... wait here (yawn)...",
+              "https://azurlane.koumakan.jp/w/images/f/fb/SaratogaChibi.png" : "Commander, please wait a moment~",
+              "https://azurlane.koumakan.jp/w/images/0/08/AyanamiChibi.png" : "Please wait a second, commander...",
+              "https://azurlane.koumakan.jp/w/images/8/84/BelfastChibi.png" : "Pardon me, Commander, but you will have to wait a second. Meanwhile, would you like some tea?"
+            };
+            // This is a slightly modified version of the solution found here: https://stackoverflow.com/a/15106541
+            var randomKey = function (loadingRandoms){
+              var keys = Object.keys(loadingRandoms);
+              return keys[keys.length * Math.random() << 0];
+            };
+            var randomKey = randomKey(loadingRandoms)
+            $("#loading_pleaseWait_char").attr("src", randomKey);
+            $("#loading_pleaseWait_phrase").text(loadingRandoms[randomKey]);
+          
           
             // An object containing the URL to useful icons.
             var icons = {
@@ -134,6 +171,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                 var interval = window.setInterval(function(){
                     if (document.title === "0"){
                         document.title = "AzurViewer";
+                        $("#loading_pleaseWait").hide();
                         ship_db = ships;
                         clearInterval(interval);
                     }
@@ -158,6 +196,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                     var parsedShips = parseListOfShips(text);
                 }
             });
+          
         </script>
     </body>
 </html>
