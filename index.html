@@ -1,39 +1,33 @@
 <!DOCTYPE html>
 
 <!-- 
-
 AzurViewer
-
 [ A web explorer for Azur Lane. Look at detailed ship stats, descriptions and more. ]
-
 -------
-
 What is the license?
 Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0), as stated with Wikimedia-related content unless stated otherwise.
 See link for more details: https://creativecommons.org/licenses/by-nc-sa/4.0/
-
 How does it work?
 Essentially, the app scrapes data from the wiki and parses it correctly into an app. This removes the need to rewrite tons and tons of 
 existing information. (phew). Of course, too many requests will flood the wiki, so data is attempted caching into localStorage.
-
 Developed by Chen Zheng (@HotFireyDeath)
 -->
 
 <html>
     <head>
         <title>AzurViewer</title>
+      
+        <!-- JQUERY -->
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+      
+        <!-- MATERIALIZE -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+      
     </head>
     <body>
-        <p id="shipItems">
-
-        </p>
-        <br>
-        <p id="temp">
-
-        </p>
         <script>
-
+          
             // An object containing the URL to useful icons.
             var icons = {
                 "firepower": "https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png",
@@ -44,10 +38,12 @@ Developed by Chen Zheng (@HotFireyDeath)
                 "aviation": "https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png",
                 "torpedo": "https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png"
             };
-
+          
+            // An object containing ALL ship data. This is a large variable.
+            var ship_db = {};
+          
             /**
              Gets the index of the nth occurance of a substring in a string.
-
              This solution was deprived from StackOverflow, original answer found here:
              https://stackoverflow.com/a/14482123
              */
@@ -59,17 +55,15 @@ Developed by Chen Zheng (@HotFireyDeath)
                 }
                 return i;
             }
-
+          
             /**
              Parses the list of ships given the wikimedia HTML parse data for https://azurlane.koumakan.jp/List_of_Ships.
              This is hard-coded, and therefore is subject to breaking. Will attempt to update as often as possible.
-
              Developed by @HotFireyDeath (Chen Zheng)
              https://czheng.me
              */
             function parseListOfShips(data) {
                 var ships = {};
-
                 // Parse ship's 'top layer' data using List of Ships Azur Wiki result.
                 for (var i = 0; i < data.length; i++) {
                     if ((i + 1) < data.length) { // Check for out of bounds.
@@ -95,12 +89,10 @@ Developed by Chen Zheng (@HotFireyDeath)
                         }
                     }
                 }
-
                 document.title = "0";
-
                 // Deep search for each ship, grab available stats.
-                //for (var name in ships) {
-                    var name = "Universal Bullin";
+                for (var name in ships) {
+                    //var name = "Universal Bullin";
                     var shipNameTag = ships[name]["pageLink"].substring(1);
                     document.title = (parseInt(document.title) + 1) + "";
                     $.ajax({
@@ -117,25 +109,38 @@ Developed by Chen Zheng (@HotFireyDeath)
                             document.title = (parseInt(document.title) - 1) + "";
                             var raw = data["parse"]["wikitext"]["*"];
                             raw = raw.split("|");
-                            $("#temp").text(JSON.stringify(raw));
-                            // TO-DO: Parse raw data to ships.
+                          
+                            // Reverse search ships by matching ID.
+                            var currentShipID = raw[1].split("=")[1].trim();
+                            for (var s in ships){
+                              if (ships[s]["id"] === currentShipID){
+                                ships[s]["detailedItems"] = {};
+                                raw.forEach(function(item){
+                                  var twig = item.split("=");
+                                  if (twig.length === 2){
+                                    // Remove format whitespacing.
+                                    twig[0] = twig[0].trim();
+                                    twig[1] = twig[1].trim();
+                                    ships[s]["detailedItems"][twig[0]] = twig[1];
+                                  }
+                                });
+                              }
+                            }
                         }
                     });
-                //}
-
-                // Essentially, waits until the ajaxes (above) are done, and then renders the page.
+                }
+              
+                // Essentially, waits until the ajaxes (above) are done, and then saves the data.
                 var interval = window.setInterval(function(){
                     if (document.title === "0"){
-                        render(ships);
+                        document.title = "AzurViewer";
+                        ship_db = ships;
                         clearInterval(interval);
                     }
                 }, 1000);
             }
-
-            function render(ships){
-                $("#shipItems").text(JSON.stringify(ships));
-            }
-
+          
+            
             $.ajax({
                 url: "https://azurlane.koumakan.jp/w/api.php",
                 method: "GET",
@@ -149,16 +154,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                     // text variable contains a fragment of HTML.
                     var text = data['parse']['text']['*'];
                     text = text.split("<");
-                    /*
-
-                    Code slice is for testing purposes only. Prints out a big list.
-
-                    text = text.split("<");
-                    text.forEach(function(item, index){
-                      $("#item").html($("#item").html() + index + " " + item + "<br>");
-                    });
-                    */
-
+                  
                     var parsedShips = parseListOfShips(text);
                 }
             });
