@@ -96,11 +96,13 @@ Developed by Chen Zheng (@HotFireyDeath)
                     }
                 }
 
-                var activePings = 0;
+                document.title = "0";
+
                 // Deep search for each ship, grab available stats.
-                for (var name in ships) {
+                //for (var name in ships) {
+                    var name = "Universal Bullin";
                     var shipNameTag = ships[name]["pageLink"].substring(1);
-                    activePings++;
+                    document.title = (parseInt(document.title) + 1) + "";
                     $.ajax({
                         url: "https://azurlane.koumakan.jp/w/api.php",
                         method: "GET",
@@ -108,26 +110,26 @@ Developed by Chen Zheng (@HotFireyDeath)
                         data: {
                             action: "parse",
                             page: shipNameTag,
+                            prop: "wikitext",
                             format: "json"
                         },
                         success: function (data) {
-                            // TO-DO: Parse deep data for each ship and enter into the ship array.
-                            // Still bugged :( pages are loading slowly and crashing....
-                            var raw = data["parse"]["text"]["*"];
-                            raw = raw.split("<");
-                            ships[name].type_abbrev = raw[9].substring(5, raw[9].indexOf(name));
-                            ships[name].aka = {
-                                "cn" : raw[9].substring(raw[9].indexOf("(") + 4, raw[9].indexOf(";")),
-                                "jp" : raw[9].substring(raw[9].indexOf(";") + 5, raw[9].indexOf(")") - 1)
-                            };
-                            activePings--;
-                            if (activePings < 1) {
-                                alert("All queries completed.");
-                                render(ships);
-                            }
+                            document.title = (parseInt(document.title) - 1) + "";
+                            var raw = data["parse"]["wikitext"]["*"];
+                            raw = raw.split("|");
+                            $("#temp").text(JSON.stringify(raw));
+                            // TO-DO: Parse raw data to ships.
                         }
                     });
-                }
+                //}
+
+                // Essentially, waits until the ajaxes (above) are done, and then renders the page.
+                var interval = window.setInterval(function(){
+                    if (document.title === "0"){
+                        render(ships);
+                        clearInterval(interval);
+                    }
+                }, 1000);
             }
 
             function render(ships){
