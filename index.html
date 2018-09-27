@@ -71,6 +71,13 @@ Developed by Chen Zheng (@HotFireyDeath)
     </div>
 </div>
 
+<div id="ship_displayCase" style="display: none;">
+    <div class="container">
+        <h4 id="ship_displayCase_name" style="text-align: center;"></h4>
+        <p id="rawDATA"></p> <!-- remove after development -->
+    </div>
+</div>
+
 <script>
 
     // Set random loading character and 'slogan'.
@@ -111,10 +118,10 @@ Developed by Chen Zheng (@HotFireyDeath)
     var searchTextCache = "";
 
     /**
-     Gets the index of the nth occurance of a substring in a string.
-     This solution was deprived from StackOverflow, original answer found here:
-     https://stackoverflow.com/a/14482123
-     */
+     * Gets the index of the nth occurance of a substring in a string.
+     * This solution was deprived from StackOverflow, original answer found here:
+     * https://stackoverflow.com/a/14482123
+     * */
     function nthIndex(str, pat, n) {
         var L = str.length, i = -1;
         while (n-- && i++ < L) {
@@ -125,10 +132,21 @@ Developed by Chen Zheng (@HotFireyDeath)
     }
 
     /**
-     Parses the list of ships given the wikimedia HTML parse data for https://azurlane.koumakan.jp/List_of_Ships.
-     This is hard-coded, and therefore is subject to breaking. Will attempt to update as often as possible.
-     Developed by @HotFireyDeath (Chen Zheng)
-     https://czheng.me
+     * Renders the ship display case with the given ship.
+     */
+    function renderShipDisplayCase(shipName){
+        $("#search").val("");
+        var shipChunk = ship_db[shipName];
+        $("#ship_displayCase").show();
+        $("#ship_displayCase_name").html(shipName + " <small><small><small>(CN: " + shipChunk["detailedItems"]["CNName"] + "; JP: " + shipChunk["detailedItems"]["JPName"] + ")</small></small></small>");
+        //$("#rawDATA").text(JSON.stringify(ship_db[shipName]));
+    }
+
+    /**
+     * Parses the list of ships given the wikimedia HTML parse data for https://azurlane.koumakan.jp/List_of_Ships.
+     * This is hard-coded, and therefore is subject to breaking. Will attempt to update as often as possible.
+     * Developed by @HotFireyDeath (Chen Zheng)
+     * https://czheng.me
      */
     function parseListOfShips(data) {
         var ships = {};
@@ -235,8 +253,10 @@ Developed by Chen Zheng (@HotFireyDeath)
 
     // Makes the search results appear and disappear as search is focused.
     window.setInterval(function () {
-        if ($("#search").is(":focus")) {
+        var search = $("#search");
+        if (search.is(":focus") && (search.val().length > 0)) {
             $("#search_results").show();
+            $("#ship_displayCase").hide();
         }
         else {
             $("#search_results").hide();
@@ -256,7 +276,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                 node.removeChild(node.firstChild);
             }
             if (searchResult.length > 0) {
-                if (searchResult === "help") {
+                if (searchResult.toLowerCase() === "help") {
                     var helpData = {
                         "regular search" : "Enter text and search results will appear based on ship name.",
                         "compare" : "Compares named ships' stats. <a onclick='$(\"#search\").val(\"compare prinz eugen, belfast, universal bullin\");' style='cursor: pointer;'>Click for an example</a>",
@@ -278,7 +298,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                             var parent = document.getElementById("search_results");
                             var newListElement = document.createElement("LI");
                             newListElement.className = "collection-item";
-                            newListElement.innerHTML = "<a onclick='alert(\"" + item + "\")' style='color: black; text-decoration: none;'>" + item + "</a>";
+                            newListElement.innerHTML = "<a onclick='renderShipDisplayCase(\"" + item + "\")' style='color: black; text-decoration: none; cursor: pointer;'>" + item + "</a>";
                             parent.appendChild(newListElement);
                         }
                     });
