@@ -9,7 +9,7 @@ Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0), as sta
 See link for more details: https://creativecommons.org/licenses/by-nc-sa/4.0/
 How does it work?
 Essentially, the app scrapes data from the wiki and parses it correctly into an app. This removes the need to rewrite tons and tons of 
-existing information. (phew). Of course, too many requests will flood the wiki, so data is attempted caching into localStorage.
+existing information. (phew).
 Developed by Chen Zheng (@HotFireyDeath)
 -->
 
@@ -64,6 +64,7 @@ Developed by Chen Zheng (@HotFireyDeath)
             </div>
             <div class="card-stacked">
                 <div class="card-content" style="text-align: center;" id="loading_pleaseWait_phrase">
+                    <span id="loading_pleaseWait_percentage" style="font-size: 10px;"></span>
                     <span class="card-title">Loading...</span>
                 </div>
             </div>
@@ -74,6 +75,10 @@ Developed by Chen Zheng (@HotFireyDeath)
 <div id="ship_displayCase" style="display: none;">
     <div class="container">
         <h4 id="ship_displayCase_name" style="text-align: center;"></h4>
+        <div class="row">
+            <div class="col s6"><img src="https://azurlane.koumakan.jp/w/images/0/06/Akagi.png"></div>
+            <div class="col s6">Some stats</div>
+        </div>
         <p id="rawDATA"></p> <!-- remove after development -->
     </div>
 </div>
@@ -175,12 +180,13 @@ Developed by Chen Zheng (@HotFireyDeath)
                 }
             }
         }
-        document.title = "0";
+        localStorage.setItem('fullDataAmount', "0");
+        localStorage.setItem('dataFetched', "0");
         // Deep search for each ship, grab available stats.
         for (var name in ships) {
             //var name = "Universal Bullin";
             var shipNameTag = ships[name]["pageLink"].substring(1);
-            document.title = (parseInt(document.title) + 1) + "";
+            localStorage.setItem('fullDataAmount', (parseInt(localStorage.getItem('fullDataAmount')) + 1) + "");
             $.ajax({
                 url: "https://azurlane.koumakan.jp/w/api.php",
                 method: "GET",
@@ -192,7 +198,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                     format: "json"
                 },
                 success: function (data) {
-                    document.title = (parseInt(document.title) - 1) + "";
+                    localStorage.setItem('dataFetched', (parseInt(localStorage.getItem('dataFetched')) + 1) + "");
                     var raw = data["parse"]["wikitext"]["*"];
                     raw = raw.split("|");
 
@@ -214,11 +220,53 @@ Developed by Chen Zheng (@HotFireyDeath)
                     }
                 }
             });
+
+            // Separate ajax calls for images.
+            localStorage.setItem('fullDataAmount', (parseInt(localStorage.getItem('fullDataAmount')) + 1) + "");
+            $.ajax({
+                url: "https://azurlane.koumakan.jp/w/api.php",
+                method: "GET",
+                dataType: "jsonp",
+                data: {
+                    action: "query",
+                    titles: shipNameTag,
+                    prop: "images",
+                    format: "json"
+                },
+                success: function(data2){
+                    localStorage.setItem('dataFetched', (parseInt(localStorage.getItem('dataFetched')) + 1) + "");
+                    var needData = data2["query"]["pages"][Object.keys(data2["query"]["pages"])[0]];
+                    var shipName = needData["title"]; // key
+                    ships[shipName]["images"] = {};
+                    needData["images"].forEach(function(item){
+                        var targetFile = item["title"]; //File:AntiAir.png, for example.
+                        localStorage.setItem('fullDataAmount', (parseInt(localStorage.getItem('fullDataAmount')) + 1) + "");
+                        $.ajax({
+                            url: "https://azurlane.koumakan.jp/w/api.php",
+                            method: "GET",
+                            dataType: "jsonp",
+                            data: {
+                                action: "query",
+                                titles: targetFile,
+                                prop: "imageinfo",
+                                iiprop: "url",
+                                format: "json"
+                            },
+                            success: function(data3){
+                                localStorage.setItem('dataFetched', (parseInt(localStorage.getItem('dataFetched')) + 1) + "");
+                                ships[shipName]["images"][targetFile] = data3["query"]["pages"][Object.keys(data3["query"]["pages"])[0]]["imageinfo"][0]["url"];
+                            }
+                        });
+                    });
+                }
+            });
         }
 
         // Essentially, waits until the ajaxes (above) are done, and then saves the data.
         var interval = window.setInterval(function () {
-            if (document.title === "0") {
+            $("#loading_pleaseWait_percentage").text( Math.round((parseInt(localStorage.getItem('dataFetched'))/parseFloat(localStorage.getItem('fullDataAmount'))) * 100) + "% done");
+            if (localStorage.getItem('dataFetched') === localStorage.getItem('fullDataAmount')) {
+
                 // All data received, now parse and render.
                 document.title = "AzurViewer";
                 $("#loading_pleaseWait").hide();
@@ -227,7 +275,7 @@ Developed by Chen Zheng (@HotFireyDeath)
 
                 clearInterval(interval);
             }
-            else if ((document.readyState === "complete") && ["AzurViewer", "0"].indexOf(document.title) === -1) {
+            else if ((document.readyState === "complete") && (localStorage.getItem('dataFetched') !== localStorage.getItem('fullDataAmount'))) {
                 alert("Unable to fetch data. Retrying...");
                 location.reload();
             }
