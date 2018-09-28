@@ -97,12 +97,32 @@ Developed by Chen Zheng (@HotFireyDeath)
 
 <div id="ship_displayCase" style="display: none;">
     <div class="container">
-        <h4 id="ship_displayCase_name" style="text-align: center;"></h4>
-        <div class="imgbox"><img class="center-fit" onclick="" id="ship_displayCase_skinpicture" src="https://azurlane.koumakan.jp/w/images/0/06/Akagi.png"></div>
+        <p id="ship_displayCase_rawData"></p> <!-- rawData div will only be filled for development purpose. -->
+        <h4 id="ship_displayCase_name" style="text-align: center;" onclick="checkClick();"></h4>
+        <div class="imgbox"><img onclick="displaySkinModal();" class="center-fit" id="ship_displayCase_skinpicture" src="https://azurlane.koumakan.jp/w/images/0/06/Akagi.png"></div>
+    </div>
+</div>
+
+<div id="skinModal" class="modal">
+    <div class="modal-content">
+        <h4>Select a skin: </h4>
+        <ul class="collection" id="skinModal_list"></ul>
     </div>
 </div>
 
 <script>
+
+    // Development raw data name clicker.
+    var devClicks = 0;
+    function checkClick(){
+        if (devClicks === 10){
+            $("#ship_displayCase_rawData").text(JSON.stringify(ship_db[document.title]));
+            devClicks = 0;
+        }
+        else{
+            devClicks++;
+        }
+    }
 
     // Set random loading character and 'slogan'.
     var loadingRandoms = {
@@ -112,7 +132,8 @@ Developed by Chen Zheng (@HotFireyDeath)
         "https://azurlane.koumakan.jp/w/images/8/84/BelfastChibi.png": "Pardon me, Commander, but you will have to wait a second. In the meantime, would you like some tea?",
         "https://azurlane.koumakan.jp/w/images/7/70/AkashiChibi.png": "Commander, wait here while I examine the site meow...",
         "https://azurlane.koumakan.jp/w/images/e/e7/UnicornChibi.png": "Big brother... Unicorn will stay with you while you wait...",
-        "https://azurlane.koumakan.jp/w/images/2/2c/Ning_HaiChibi.png": "I wonder if the fleet's expenses can be covered by this site..."
+        "https://azurlane.koumakan.jp/w/images/2/2c/Ning_HaiChibi.png": "I wonder if the fleet's expenses can be covered by this site...",
+        "https://azurlane.koumakan.jp/w/images/f/f5/AjaxChibi.png" : "My cute piggy, allow me to step on your face~"
     };
     // This is a slightly modified version of the solution found here: https://stackoverflow.com/a/15106541
     var randomKey = function (loadingRandoms) {
@@ -142,7 +163,7 @@ Developed by Chen Zheng (@HotFireyDeath)
     // An object containing ALL resource data. This is a fairly large variable.
     var resource_db = {};
 
-    var searchTextCache = "";
+    var searchTextCache = '';
 
     /**
      * Gets the index of the nth occurance of a substring in a string.
@@ -159,9 +180,66 @@ Developed by Chen Zheng (@HotFireyDeath)
     }
 
     /**
+     * Displays the skins for the current ship in a modal.
+     */
+    function displaySkinModal(){
+
+        // Remove previous results (visual).
+        var node = document.getElementById('skinModal_list');
+        while (node.firstChild) {
+            node.removeChild(node.firstChild);
+        }
+
+        // Search and list all skins.
+        var shipName = document.title;
+        for (var fileName in resource_db){
+            if (
+                (fileName.indexOf(shipName) !== -1) &&
+                (fileName.indexOf('Chibi') === -1) &&
+                (fileName.indexOf('Icon') === -1) &&
+                (fileName.indexOf('Banner') === -1) &&
+                (fileName.indexOf('Questline') === -1) &&
+                (fileName.indexOf('head') === -1) &&
+                (fileName.indexOf('Title') === -1) &&
+                (fileName.indexOf('shopskin') === -1) &&
+                (fileName.indexOf('Card') === -1)
+                ){
+                var extension = fileName.split('.').pop(); // gets the file extension.
+                if (extension === 'png'){
+                    var parent = document.getElementById('skinModal_list');
+                    var child = document.createElement('LI');
+                    child.className = 'collection-item';
+                    child.innerHTML = '<a onclick="forceSkin(\'' + fileName + '\');" style="color: black; text-decoration: none; cursor: pointer;">' + fileName.replace('.png', ' ') + '</a>';
+                    parent.appendChild(child);
+                }
+            }
+        }
+
+        // Display modal after all the work is done.
+        var sm = $('#skinModal');
+        sm.modal();
+        sm.modal('open');
+    }
+
+    /**
+     * Force loads a skin into the viewer given a file key.
+     */
+    function forceSkin(fileKey){
+        var sp = $("#ship_displayCase_skinpicture");
+        sp.hide();
+        sp.ready(function(){ $("#ship_displayCase_skinpicture").show(); });
+        sp.attr("src", resource_db[fileKey]);
+
+        // Since this method is only used for skin loading, close skin modal once processing.
+        $('#skinModal').modal('close');
+    }
+
+    /**
      * Renders the ship display case with the given ship.
      */
     function renderShipDisplayCase(shipName) {
+
+        document.title = shipName;
 
         // General display and name.
         $("#search").val("");
@@ -318,6 +396,9 @@ Developed by Chen Zheng (@HotFireyDeath)
         if (search.is(":focus") && (search.val().length > 0)) {
             $("#search_results").show();
             $("#ship_displayCase").hide();
+            document.title = "AzurViewer";
+            devClicks = 0;
+            $("#ship_displayCase_rawData").text("");
         }
         else {
             $("#search_results").hide();
@@ -358,6 +439,10 @@ Developed by Chen Zheng (@HotFireyDeath)
                             // add to search_results
                             var parent = document.getElementById("search_results");
                             var newListElement = document.createElement("LI");
+                            newListElement.onclick = function() {
+                                renderShipDisplayCase(item);
+                            };
+                            newListElement.style.cursor = "pointer";
                             newListElement.className = "collection-item";
                             newListElement.innerHTML = "<a onclick='renderShipDisplayCase(\"" + item + "\")' style='color: black; text-decoration: none; cursor: pointer;'>" + item + "</a>";
                             parent.appendChild(newListElement);
@@ -369,6 +454,12 @@ Developed by Chen Zheng (@HotFireyDeath)
 
     }, 500);
 
+    // Prevent submitting and reloading the page (by pressing enter) with omnisearch.
+    $('#search').keypress(function (event) {
+        if (event.keyCode === 10 || event.keyCode === 13) {
+            event.preventDefault();
+        }
+    });
 </script>
 </body>
 </html>
