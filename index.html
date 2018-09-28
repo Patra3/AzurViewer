@@ -100,6 +100,15 @@ Developed by Chen Zheng (@HotFireyDeath)
         <p id="ship_displayCase_rawData"></p> <!-- rawData div will only be filled for development purpose. -->
         <h4 id="ship_displayCase_name" style="text-align: center;" onclick="checkClick();"></h4>
         <div class="imgbox"><img onclick="displaySkinModal();" class="center-fit" id="ship_displayCase_skinpicture" src="https://azurlane.koumakan.jp/w/images/0/06/Akagi.png"></div>
+        <ul class="collection">
+            <li id="ship_displayCase_nationality" class="collection-item"></li>
+            <li id="ship_displayCase_rarity" class="collection-item"></li>
+            <li id="ship_displayCase_constructionTime" class="collection-item"></li>
+            <li id="ship_displayCase_class" class="collection-item"></li>
+            <li id="ship_displayCase_hullType" class="collection-item"></li>
+            <li id="ship_displayCase_id" class="collection-item"></li>
+            <li id="ship_displayCase_clickMiscInfo" class="collection-item" style="background-color: whitesmoke;"><small>Click for misc. info</small></li>
+        </ul>
     </div>
 </div>
 
@@ -191,7 +200,7 @@ Developed by Chen Zheng (@HotFireyDeath)
         }
 
         // Search and list all skins.
-        var shipName = document.title;
+        var shipName = document.title.replace(/ /g, "_");
         for (var fileName in resource_db){
             if (
                 (fileName.indexOf(shipName) !== -1) &&
@@ -206,7 +215,9 @@ Developed by Chen Zheng (@HotFireyDeath)
                 (fileName.indexOf('Emblem') === -1) &&
                 (fileName.indexOf('event') === -1) &&
                 (fileName.indexOf('Event_CN') === -1) &&
-                (fileName.indexOf('Event_JP') === -1)
+                (fileName.indexOf('Event_JP') === -1) &&
+                (fileName.indexOf('Furniture') === -1) &&
+                (fileName.indexOf('quest') === -1)
                 ){
                 var extension = fileName.split('.').pop(); // gets the file extension.
                 if (extension === 'png'){
@@ -257,6 +268,39 @@ Developed by Chen Zheng (@HotFireyDeath)
         sp.ready(function(){ $("#ship_displayCase_skinpicture").show(); });
         sp.attr("src", resource_db[shipName.replace(/ /g, "_") + ".png"]);
 
+        // Ship general attributes and misc info.
+        var nationality = shipChunk["detailedItems"]["Nationality"];//detailedItems is more accurate to read from
+        var rarity = shipChunk["detailedItems"]["Rarity"];
+        var constructionTime = shipChunk["detailedItems"]["ConstructTime"];
+        var clas = shipChunk["detailedItems"]["Class"];
+        var hullType = shipChunk["detailedItems"]["Type"];
+        var id = shipChunk["detailedItems"]["ID"];
+        var nationalityColorTypes = {
+            "Sakura Empire" : "pink",
+            "Eagle Union" : "dodgerblue",
+            "Royal Navy" : "lightblue",
+            "Ironblood" : "lightcoral",
+            "Eastern Radiance" : "hotpink",
+            "North Union" : "lightgray",
+            "Iris Libre" : "gold",
+            "Vichya Dominion" : "italianred"
+        };
+        var rarityColorTypes = {
+            "Normal" : "lightgray",
+            "Rare" : "lightblue",
+            "Elite" : "mediumpurple",
+            "Super Rare" : "gold"
+        };
+        var n = $("#ship_displayCase_nationality");
+        n.css("background-color", nationalityColorTypes[nationality]);
+        n.html("<small>Nationality</small> " + nationality);
+        var r = $("#ship_displayCase_rarity");
+        r.css("background-color", rarityColorTypes[rarity]);
+        r.html("<small>Rarity</small> " + rarity);
+        $("#ship_displayCase_constructionTime").html("<small>Construction Time</small> " + constructionTime);
+        $("#ship_displayCase_class").html("<small>Class</small> " + clas);
+        $("#ship_displayCase_hullType").html("<small>Hull Type</small> " + hullType);
+        $("#ship_displayCase_id").html("<small>ID</small> " + id);
     }
 
     /**
