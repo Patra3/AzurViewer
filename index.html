@@ -107,7 +107,7 @@ Developed by Chen Zheng (@HotFireyDeath)
             <li id="ship_displayCase_class" class="collection-item"></li>
             <li id="ship_displayCase_hullType" class="collection-item"></li>
             <li id="ship_displayCase_id" class="collection-item"></li>
-            <li id="ship_displayCase_clickMiscInfo" class="collection-item" style="background-color: whitesmoke;"><small>Click for misc. info</small></li>
+            <li id="ship_displayCase_clickMiscInfo" class="collection-item" style="background-color: whitesmoke; cursor: pointer;" onclick="$('#miscInfoModal').modal('open');"><small>Click for misc. info</small></li>
         </ul>
     </div>
 </div>
@@ -116,6 +116,16 @@ Developed by Chen Zheng (@HotFireyDeath)
     <div class="modal-content">
         <h4>Select a skin: </h4>
         <ul class="collection" id="skinModal_list"></ul>
+    </div>
+</div>
+
+<div id="miscInfoModal" class="modal">
+    <div class="modal-content">
+        <h4>Misc. Info</h4>
+        <ul class="collection">
+            <li id="miscInfoModal_artist" class="collection-item"></li>
+            <li id="miscInfoModal_voiceActress" class="collection-item"></li>
+        </ul>
     </div>
 </div>
 
@@ -233,7 +243,6 @@ Developed by Chen Zheng (@HotFireyDeath)
 
         // Display modal after all the work is done.
         var sm = $('#skinModal');
-        sm.modal();
         sm.modal('open');
     }
 
@@ -302,6 +311,16 @@ Developed by Chen Zheng (@HotFireyDeath)
         $("#ship_displayCase_class").html("<small>Class</small> " + clas);
         $("#ship_displayCase_hullType").html("<small>Hull Type</small> " + hullType);
         $("#ship_displayCase_id").html("<small>ID</small> " + id);
+
+        // Ship misc info modal.
+        $('#miscInfoModal_artist').html("<small>Artist</small> <a target='_blank' href='" + shipChunk['detailedItems']['ArtistLink'].replace('[', '').replace(']', '').replace(shipChunk['detailedItems']['Artist'], '') +
+            "'>" + shipChunk['detailedItems']['Artist'] + "</a>");
+        var VAchunk = shipChunk['detailedItems']['VA']; // have to process this before putting into HTML.
+        VAchunk = VAchunk.replace('[', '').replace(']', '').replace('https://en.wikipedia.org/wiki/', '');
+        VAchunk = VAchunk.substring(0, VAchunk.indexOf(' '));
+        VAchunk = decodeURIComponent(VAchunk);
+        var VAlink = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(VAchunk);
+        $('#miscInfoModal_voiceActress').html("<small>Voice Actress</small> <a target='_blank' href='" + VAlink + "'>" + VAchunk.replace('_', ' ') + "</a>");
     }
 
     /**
@@ -481,6 +500,13 @@ Developed by Chen Zheng (@HotFireyDeath)
                         parent.appendChild(newListElement);
                     }
                 }
+                else if (searchResult.toLowerCase().indexOf('compare') !== -1){
+                    var parent = document.getElementById("search_results");
+                    var newListElement = document.createElement("LI");
+                    newListElement.className = "collection-item";
+                    newListElement.innerHTML = "<b>Compare functionality currently not added. Please check back later.</b> ( O w O ) /";
+                    parent.appendChild(newListElement);
+                }
                 else {
                     var shipNames = Object.keys(ship_db);
                     shipNames.forEach(function (item) {
@@ -509,6 +535,9 @@ Developed by Chen Zheng (@HotFireyDeath)
             event.preventDefault();
         }
     });
+
+    $('#skinModal').modal();
+    $('#miscInfoModal').modal();
 </script>
 </body>
 </html>
