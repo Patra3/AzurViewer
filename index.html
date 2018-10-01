@@ -485,6 +485,16 @@ Developed by Chen Zheng (@HotFireyDeath)
             while (node.firstChild) {
                 node.removeChild(node.firstChild);
             }
+
+            // TO-DO: Implement keyword searching in omnisearch..
+            // Get the object keys from ship object (searching indexes).
+            var searchKeywords = Object.keys(ship_db['Ayanami']);
+            // Remove detailed items array key.
+            var index = searchKeywords.indexOf('detailedItems');
+            if (index !== -1) searchKeywords.splice(index, 1);
+            // Combine detailedItems keys as well.
+            searchKeywords = searchKeywords.concat(Object.keys(ship_db['Ayanami']['detailedItems']));
+
             if (searchResult.length > 0) {
                 if (searchResult.toLowerCase() === "help") {
                     var helpData = {
@@ -493,19 +503,17 @@ Developed by Chen Zheng (@HotFireyDeath)
                         "help": "Shows all possible commands."
                     };
                     for (var name in helpData) {
-                        var parent = document.getElementById("search_results");
-                        var newListElement = document.createElement("LI");
-                        newListElement.className = "collection-item";
-                        newListElement.innerHTML = name + " : " + helpData[name];
-                        parent.appendChild(newListElement);
+                        var newListElement = $("<li></li>");
+                        newListElement.addClass('collection-item');
+                        newListElement.html(name + " : " + helpData[name]);
+                        $('#search_results').append(newListElement);
                     }
                 }
                 else if (searchResult.toLowerCase().indexOf('compare') !== -1){
-                    var parent = document.getElementById("search_results");
-                    var newListElement = document.createElement("LI");
-                    newListElement.className = "collection-item";
-                    newListElement.innerHTML = "<b>Compare functionality currently not added. Please check back later.</b> ( O w O ) /";
-                    parent.appendChild(newListElement);
+                    var newListElement = $('<li></li>');
+                    newListElement.addClass('collection-item');
+                    newListElement.html("<b>Compare functionality currently not added. Please check back later.</b> ( O w O ) /");
+                    $('#search_results').append(newListElement);
                 }
                 else {
                     var shipNames = Object.keys(ship_db);
