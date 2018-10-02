@@ -3,7 +3,8 @@
 <!-- 
 AzurViewer
 [ A web explorer for Azur Lane. Look at detailed ship stats, descriptions and more. ]
--------
+
+
 What is the license?
 Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0), as stated with Wikimedia-related content unless stated otherwise.
 See link for more details: https://creativecommons.org/licenses/by-nc-sa/4.0/
@@ -476,17 +477,17 @@ Developed by Chen Zheng (@HotFireyDeath)
     // Search functionality (WIP)
     window.setInterval(function () {
 
-        var searchResult = $("#search").val();
+        var omnisearch = $("#search").val();
+        var searchResult = $('#search_results');
 
-        if (searchResult !== searchTextCache) {
-            searchTextCache = searchResult;
+        if (omnisearch !== searchTextCache) {
+            searchTextCache = omnisearch;
             // clear current results
             var node = document.getElementById("search_results");
             while (node.firstChild) {
                 node.removeChild(node.firstChild);
             }
 
-            // TO-DO: Implement keyword searching in omnisearch..
             // Get the object keys from ship object (searching indexes).
             var searchKeywords = Object.keys(ship_db['Ayanami']);
             // Remove detailed items array key.
@@ -494,41 +495,106 @@ Developed by Chen Zheng (@HotFireyDeath)
             if (index !== -1) searchKeywords.splice(index, 1);
             // Combine detailedItems keys as well.
             searchKeywords = searchKeywords.concat(Object.keys(ship_db['Ayanami']['detailedItems']));
+            var searchByKeyword = '', keywordDetected = false;
+            searchKeywords.forEach(function(item){
+                if (omnisearch.indexOf(item + ":") === 0){
+                    // A search keyword is detected.
+                    searchByKeyword = item;
+                    keywordDetected = true;
+                }
+            });
 
-            if (searchResult.length > 0) {
-                if (searchResult.toLowerCase() === "help") {
+            if (omnisearch.length > 0) {
+                if (keywordDetected){
+                    // Special keyword search. seasrchByKeyword should be defined as an object key.
+                    // Attempt to detect if the property is from 'detailedItems'
+
+                    // First, though, notify the user that we are searching by special keyword.
+                    var searchTarget = omnisearch.substring(searchByKeyword.length + 1).trim();
+                    var notify = $('<li></li>');
+                    notify.addClass('collection-item');
+                    notify.html('<b>Searching by ' + searchByKeyword + ' ... (' + searchTarget + ')</b>');
+                    searchResult.append(notify);
+                    var addition = $('<li></li>');
+                    addition.addClass('collection-item');
+                    addition.html('<i>For a full list of searchable components, click <a onclick="$(\'#search\').val(\'allsearchablecomponents\');" style="cursor:pointer;">here</a>.</i>');
+                    searchResult.append(addition);
+                    if (searchByKeyword[0] === searchByKeyword[0].toUpperCase()){
+                        // first letter is uppercase, search inside detailedItems.
+                        var shipNames = Object.keys(ship_db);
+                        shipNames.forEach(function (name) {
+                            if (ship_db[name]['detailedItems'][searchByKeyword].toLowerCase().indexOf(searchTarget.toLowerCase()) !== -1){
+                                var newListElement = $('<li></li>');
+                                newListElement.addClass('collection-item');
+                                newListElement.click(function(){
+                                    renderShipDisplayCase(name);
+                                });
+                                newListElement.html('<a onclick="renderShipDisplayCase(\'' + name + '\')" style=\'color: black; text-decoration: none; cursor: pointer;\'>' + name + '</a>');
+                                searchResult.append(newListElement);
+                            }
+                        });
+                    }
+                    else{
+                        // same type of search, but perform outside detailedItems.
+                        var shipNames = Object.keys(ship_db);
+                        shipNames.forEach(function (name) {
+                            if (ship_db[name][searchByKeyword].toLowerCase().indexOf(searchTarget.toLowerCase()) !== -1){
+                                var newListElement = $('<li></li>');
+                                newListElement.addClass('collection-item');
+                                newListElement.click(function(){
+                                    renderShipDisplayCase(name);
+                                });
+                                newListElement.html('<a onclick="renderShipDisplayCase(\'' + name + '\')" style=\'color: black; text-decoration: none; cursor: pointer;\'>' + name + '</a>');
+                                searchResult.append(newListElement);
+                            }
+                        });
+                    }
+                }
+                else if (omnisearch.toLowerCase() === "help") {
                     var helpData = {
                         "regular search": "Enter text and search results will appear based on ship name.",
                         "compare": "Compares named ships' stats. <a onclick='$(\"#search\").val(\"compare prinz eugen, belfast, universal bullin\");' style='cursor: pointer;'>Click for an example</a>",
+                        "allsearchablecomponents" : "Gives a list of searchable keywords, with examples built in.",
                         "help": "Shows all possible commands."
                     };
                     for (var name in helpData) {
                         var newListElement = $("<li></li>");
                         newListElement.addClass('collection-item');
                         newListElement.html(name + " : " + helpData[name]);
-                        $('#search_results').append(newListElement);
+                        searchResult.append(newListElement);
                     }
                 }
-                else if (searchResult.toLowerCase().indexOf('compare') !== -1){
+                else if (omnisearch.toLowerCase() === 'allsearchablecomponents'){
+                    var allComps = $('<li></li>');
+                    allComps.addClass('collection-item');
+                    allComps.html('<b>Search format is [component]: search. All searchable components: </b>');
+                    searchResult.append(allComps);
+                    searchKeywords.forEach(function (item) {
+                        var c = $('<li></li>');
+                        c.addClass('collection-item');
+                        c.html('<i><a onclick="$(\'#search\').val(\'' + item + ': \');" style="cursor:pointer;">' + item + '</a></i>');
+                        searchResult.append(c);
+                    });
+                }
+                else if (omnisearch.toLowerCase().indexOf('compare') !== -1){
                     var newListElement = $('<li></li>');
                     newListElement.addClass('collection-item');
                     newListElement.html("<b>Compare functionality currently not added. Please check back later.</b> ( O w O ) /");
-                    $('#search_results').append(newListElement);
+                    searchResult.append(newListElement);
                 }
                 else {
                     var shipNames = Object.keys(ship_db);
                     shipNames.forEach(function (item) {
-                        if (item.toLowerCase().indexOf(searchResult.toLowerCase()) !== -1) {
+                        if (item.toLowerCase().indexOf(omnisearch.toLowerCase()) !== -1) {
                             // add to search_results
-                            var parent = document.getElementById("search_results");
-                            var newListElement = document.createElement("LI");
-                            newListElement.onclick = function() {
+                            var newListElement = $('<li></li>');
+                            newListElement.click(function() {
                                 renderShipDisplayCase(item);
-                            };
-                            newListElement.style.cursor = "pointer";
-                            newListElement.className = "collection-item";
-                            newListElement.innerHTML = "<a onclick='renderShipDisplayCase(\"" + item + "\")' style='color: black; text-decoration: none; cursor: pointer;'>" + item + "</a>";
-                            parent.appendChild(newListElement);
+                            });
+                            newListElement.css('cursor', 'pointer');
+                            newListElement.addClass('collection-item');
+                            newListElement.html("<a onclick='renderShipDisplayCase(\"" + item + "\")' style='color: black; text-decoration: none; cursor: pointer;'>" + item + "</a>");
+                            searchResult.append(newListElement);
                         }
                     });
                 }
