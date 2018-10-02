@@ -21,6 +21,7 @@ A development checkmark is available below. More features may be added in the fu
 - [x] View ship skins.
 - [ ] View ship battle stats (firepower, retrofit, abilities, etc).
 - [ ] Ship comparisons to find out which ship excels where.
+
 *Possible/potential features in the future...*
 - [ ] Search, compare, and view all equipment.
 - [ ] Create accounts to find more friends and guilds.
