@@ -112,29 +112,73 @@ http://czheng.me
             </li>
         </ul>
         
-        <!-- CONCEPT WIP 
-        <div class="card horizontal">
-            <div class="card-image">
-                <img class="activator" src="https://azurlane.koumakan.jp/w/images/2/22/AyanamiIcon.png">
+        <!-- ship stats -->
+        <div class="card">
+            <div class="card-tabs">
+              <ul class="tabs tabs-fixed-width">
+                <li class="tab"><a href="#test4">Lv. 100 Retrofit</a></li>
+                <li class="tab"><a href="#test5">Lv. 100</a></li>
+                <li class="tab"><a href="#test5">Lv. 120 Retrofit</a></li>
+                <li class="tab"><a href="#test5">Lv. 120</a></li>
+                <li class="tab"><a href="#test6">Base</a></li>
+              </ul>
             </div>
-            <div class="card-content">
-                <span class="card-title activator">Level 100</span>
-                <a class="waves-effect waves-blue btn-flat">Select status</a>
+            <div class="card-content grey lighten-4">
                 <ul class="collection">
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png" class="circle">
+                        <span class="title">Health</span>
+                        <p id="ship_displayCase_health"></p>
+                    </li>
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/0/06/Armor.png/25px-Armor.png" class="circle">
+                        <span class="title">Armor Type</span>
+                        <p id="ship_displayCase_armorType"></p>
+                    </li>
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/e/e3/Refill.png/25px-Refill.png" class="circle">
+                        <span class="title">Reload</span>
+                        <p id="ship_displayCase_reload"></p>
+                    </li>
                     <li class="collection-item avatar">
                         <img src="https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png" class="circle">
                         <span class="title">Firepower</span>
-                        <p>57 (D)</p>
+                        <p id="ship_displayCase_firepower"></p>
+                    </li>
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png" class="circle">
+                        <span class="title">Torpedo</span>
+                        <p id="ship_displayCase_torpedo"></p>
+                    </li>
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/d/d2/Evasion.png/25px-Evasion.png" class="circle">
+                        <span class="title">Evasion</span>
+                        <p id="ship_displayCase_evasion"></p>
+                    </li>
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/0/0f/AntiAir.png/25px-AntiAir.png" class="circle">
+                        <span class="title">Anti-Air</span>
+                        <p id="ship_displayCase_antiAir"></p>
+                    </li>
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png" class="circle">
+                        <span class="title">Air Power</span>
+                        <p id="ship_displayCase_airPower"></p>
+                    </li>
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/9/90/Consumption.png/25px-Consumption.png" class="circle">
+                        <span class="title">Oil consumption</span>
+                        <p id="ship_displayCase_oilConsumption"></p>
+                    </li>
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/1/16/ASW.png/25px-ASW.png" class="circle">
+                        <span class="title">Anti-submarine warfare</span>
+                        <p id="ship_displayCase_antiSubmarineWarfare"></p>
                     </li>
                 </ul>
             </div>
-            <div class="card-reveal">
-                <span class="card-title grey-text text-darken-4">Card Title <i class="fas fa-times right"></i></span>
-                <p>Here is some more information about this product that is only revealed once clicked on.</p>
-            </div>
         </div>
         
-        -->
     </div>
 </div>
 
@@ -190,19 +234,6 @@ http://czheng.me
     $("#loading_pleaseWait_char").attr("src", randomKey);
     var phrase = $("#loading_pleaseWait_phrase");
     phrase.html(phrase.html() + loadingRandoms[randomKey]);
-
-https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png
- class="circle">
- <span class="title">Firepower// An object containing the URL to useful icons.
-    var icons = {
-        "firepower": "https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png",
-        "health": "https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png",
-        "anti_air": "https://azurlane.koumakan.jp/w/images/thumb/0/0f/AntiAir.png/25px-AntiAir.png",
-        "evasion": "https://azurlane.koumakan.jp/w/images/thumb/d/d2/Evasion.png/25px-Evasion.png",
-        "air_power": "https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png",
-        "aviation": "https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png",
-        "torpedo": "https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png"
-    };
 
     // An object containing ALL ship data. This is a large variable.
     var ship_db = {};
@@ -378,6 +409,14 @@ https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.pn
         
     }
 
+    /**
+     * Changes the stats shown in the 'display case' for the ship.
+     * type is a proper identifier such as 'base', '100', 'kai', '120', 'kai120'.
+     */
+    function changeStats(type){
+        
+    }
+    
     /**
      * Parses the list of ships given the wikimedia HTML parse data for https://azurlane.koumakan.jp/List_of_Ships.
      * This is hard-coded, and therefore is subject to breaking. Will attempt to update as often as possible.
