@@ -4,14 +4,8 @@
 AzurViewer
 [ A web explorer for Azur Lane. Look at detailed ship stats, descriptions and more. ]
 
-
-What is the license?
-Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0), as stated with Wikimedia-related content unless stated otherwise.
-See link for more details: https://creativecommons.org/licenses/by-nc-sa/4.0/
-How does it work?
-Essentially, the app scrapes data from the wiki and parses it correctly into an app. This removes the need to rewrite tons and tons of 
-existing information. (phew).
 Developed by Chen Zheng (@HotFireyDeath)
+http://czheng.me
 -->
 
 <html>
@@ -33,7 +27,6 @@ Developed by Chen Zheng (@HotFireyDeath)
     <!-- MATERIALIZE -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-
 
     <style>
         body {
@@ -100,7 +93,8 @@ Developed by Chen Zheng (@HotFireyDeath)
     <div class="container">
         <p id="ship_displayCase_rawData"></p> <!-- rawData div will only be filled for development purpose. -->
         <h4 id="ship_displayCase_name" style="text-align: center;" onclick="checkClick();"></h4>
-        <div class="imgbox"><img onclick="displaySkinModal();" class="center-fit" id="ship_displayCase_skinpicture" src="https://azurlane.koumakan.jp/w/images/0/06/Akagi.png"></div>
+        <div class="imgbox"><img onclick="displaySkinModal();" class="center-fit" id="ship_displayCase_skinpicture"
+                                 src="https://azurlane.koumakan.jp/w/images/0/06/Akagi.png"></div>
         <ul class="collection">
             <li id="ship_displayCase_nationality" class="collection-item"></li>
             <li id="ship_displayCase_rarity" class="collection-item"></li>
@@ -108,7 +102,10 @@ Developed by Chen Zheng (@HotFireyDeath)
             <li id="ship_displayCase_class" class="collection-item"></li>
             <li id="ship_displayCase_hullType" class="collection-item"></li>
             <li id="ship_displayCase_id" class="collection-item"></li>
-            <li id="ship_displayCase_clickMiscInfo" class="collection-item" style="background-color: whitesmoke; cursor: pointer;" onclick="$('#miscInfoModal').modal('open');"><small>Click for misc. info</small></li>
+            <li id="ship_displayCase_clickMiscInfo" class="collection-item"
+                style="background-color: whitesmoke; cursor: pointer;" onclick="$('#miscInfoModal').modal('open');">
+                <small>Click for misc. info</small>
+            </li>
         </ul>
     </div>
 </div>
@@ -134,12 +131,13 @@ Developed by Chen Zheng (@HotFireyDeath)
 
     // Development raw data name clicker.
     var devClicks = 0;
-    function checkClick(){
-        if (devClicks === 10){
+
+    function checkClick() {
+        if (devClicks === 10) {
             $("#ship_displayCase_rawData").text(JSON.stringify(ship_db[document.title]));
             devClicks = 0;
         }
-        else{
+        else {
             devClicks++;
         }
     }
@@ -153,7 +151,7 @@ Developed by Chen Zheng (@HotFireyDeath)
         "https://azurlane.koumakan.jp/w/images/7/70/AkashiChibi.png": "Commander, wait here while I examine the site meow...",
         "https://azurlane.koumakan.jp/w/images/e/e7/UnicornChibi.png": "Big brother... Unicorn will stay with you while you wait...",
         "https://azurlane.koumakan.jp/w/images/2/2c/Ning_HaiChibi.png": "I wonder if the fleet's expenses can be covered by this site...",
-        "https://azurlane.koumakan.jp/w/images/f/f5/AjaxChibi.png" : "My cute piggy, allow me to step on your face~"
+        "https://azurlane.koumakan.jp/w/images/f/f5/AjaxChibi.png": "My precious little piggy, let me step on your face~"
     };
     // This is a slightly modified version of the solution found here: https://stackoverflow.com/a/15106541
     var randomKey = function (loadingRandoms) {
@@ -202,7 +200,7 @@ Developed by Chen Zheng (@HotFireyDeath)
     /**
      * Displays the skins for the current ship in a modal.
      */
-    function displaySkinModal(){
+    function displaySkinModal() {
 
         // Remove previous results (visual).
         var node = document.getElementById('skinModal_list');
@@ -212,7 +210,7 @@ Developed by Chen Zheng (@HotFireyDeath)
 
         // Search and list all skins.
         var shipName = document.title.replace(/ /g, "_");
-        for (var fileName in resource_db){
+        for (var fileName in resource_db) {
             if (
                 (fileName.indexOf(shipName) !== -1) &&
                 (fileName.indexOf('Chibi') === -1) &&
@@ -229,10 +227,32 @@ Developed by Chen Zheng (@HotFireyDeath)
                 (fileName.indexOf('Event_JP') === -1) &&
                 (fileName.indexOf('Furniture') === -1) &&
                 (fileName.indexOf('quest') === -1) &&
-                (fileName.indexOf('Event') === -1)
-                ){
+                (fileName.indexOf('Event') === -1) &&
+                (fileName.indexOf('SBS') === -1) &&
+                (fileName.indexOf('Skill') === -1) &&
+                (fileName.indexOf('Defense') === -1) &&
+                (fileName.indexOf('Ddskins') === -1) &&
+                (fileName.indexOf('Offense') === -1) &&
+                (fileName.indexOf('Support') === -1) &&
+                (fileName.indexOf('plushie') === -1) &&
+                (fileName.indexOf('33000') === -1) &&
+                (fileName.indexOf('33060') === -1) &&
+                (fileName.indexOf('91033') === -1) &&
+                (fileName.indexOf('91133') === -1) &&
+                (fileName.indexOf('skill') === -1) &&
+                (fileName.indexOf('2200') === -1) &&
+                (fileName.indexOf('42200') === -1) &&
+                (fileName.indexOf('91022') === -1) &&
+                (fileName.indexOf('91122') === -1) &&
+                (fileName.indexOf('22000') === -1) &&
+                (fileName.indexOf('22100') === -1) &&
+                (fileName.indexOf('22200') === -1) &&
+                (fileName.indexOf('22260') === -1) &&
+                (fileName.indexOf('32200') === -1) &&
+                (fileName.indexOf('Piccy1_mod5_neuerenderframe_s22a') === -1)
+            ) {
                 var extension = fileName.split('.').pop(); // gets the file extension.
-                if (extension === 'png'){
+                if (extension === 'png') {
                     var parent = document.getElementById('skinModal_list');
                     var child = document.createElement('LI');
                     child.className = 'collection-item';
@@ -250,10 +270,12 @@ Developed by Chen Zheng (@HotFireyDeath)
     /**
      * Force loads a skin into the viewer given a file key.
      */
-    function forceSkin(fileKey){
+    function forceSkin(fileKey) {
         var sp = $("#ship_displayCase_skinpicture");
         sp.hide();
-        sp.ready(function(){ $("#ship_displayCase_skinpicture").show(); });
+        sp.ready(function () {
+            $("#ship_displayCase_skinpicture").show();
+        });
         sp.attr("src", resource_db[fileKey]);
 
         // Since this method is only used for skin loading, close skin modal once processing.
@@ -276,7 +298,9 @@ Developed by Chen Zheng (@HotFireyDeath)
         // Skin image
         var sp = $("#ship_displayCase_skinpicture");
         sp.hide();
-        sp.ready(function(){ $("#ship_displayCase_skinpicture").show(); });
+        sp.ready(function () {
+            $("#ship_displayCase_skinpicture").show();
+        });
         sp.attr("src", resource_db[shipName.replace(/ /g, "_") + ".png"]);
 
         // Ship general attributes and misc info.
@@ -287,20 +311,20 @@ Developed by Chen Zheng (@HotFireyDeath)
         var hullType = shipChunk["detailedItems"]["Type"];
         var id = shipChunk["detailedItems"]["ID"];
         var nationalityColorTypes = {
-            "Sakura Empire" : "pink",
-            "Eagle Union" : "dodgerblue",
-            "Royal Navy" : "lightblue",
-            "Ironblood" : "lightcoral",
-            "Eastern Radiance" : "hotpink",
-            "North Union" : "lightgray",
-            "Iris Libre" : "gold",
-            "Vichya Dominion" : "italianred"
+            "Sakura Empire": "pink",
+            "Eagle Union": "dodgerblue",
+            "Royal Navy": "lightblue",
+            "Ironblood": "lightcoral",
+            "Eastern Radiance": "hotpink",
+            "North Union": "lightgray",
+            "Iris Libre": "gold",
+            "Vichya Dominion": "italianred"
         };
         var rarityColorTypes = {
-            "Normal" : "lightgray",
-            "Rare" : "lightblue",
-            "Elite" : "mediumpurple",
-            "Super Rare" : "gold"
+            "Normal": "lightgray",
+            "Rare": "lightblue",
+            "Elite": "mediumpurple",
+            "Super Rare": "gold"
         };
         var n = $("#ship_displayCase_nationality");
         n.css("background-color", nationalityColorTypes[nationality]);
@@ -415,7 +439,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                 success: function (data2) {
                     localStorage.setItem('dataFetched', (parseInt(localStorage.getItem('dataFetched')) + 1) + "");
                     var allImages = data2["query"]["allimages"];
-                    allImages.forEach(function(item){
+                    allImages.forEach(function (item) {
                         resource_db[item["name"]] = item["url"];
                     });
                 }
@@ -496,8 +520,8 @@ Developed by Chen Zheng (@HotFireyDeath)
             // Combine detailedItems keys as well.
             searchKeywords = searchKeywords.concat(Object.keys(ship_db['Ayanami']['detailedItems']));
             var searchByKeyword = '', keywordDetected = false;
-            searchKeywords.forEach(function(item){
-                if (omnisearch.indexOf(item + ":") === 0){
+            searchKeywords.forEach(function (item) {
+                if (omnisearch.indexOf(item + ":") === 0) {
                     // A search keyword is detected.
                     searchByKeyword = item;
                     keywordDetected = true;
@@ -505,7 +529,7 @@ Developed by Chen Zheng (@HotFireyDeath)
             });
 
             if (omnisearch.length > 0) {
-                if (keywordDetected){
+                if (keywordDetected) {
                     // Special keyword search. seasrchByKeyword should be defined as an object key.
                     // Attempt to detect if the property is from 'detailedItems'
 
@@ -519,14 +543,14 @@ Developed by Chen Zheng (@HotFireyDeath)
                     addition.addClass('collection-item');
                     addition.html('<i>For a full list of searchable components, click <a onclick="$(\'#search\').val(\'allsearchablecomponents\');" style="cursor:pointer;">here</a>.</i>');
                     searchResult.append(addition);
-                    if (searchByKeyword[0] === searchByKeyword[0].toUpperCase()){
+                    if (searchByKeyword[0] === searchByKeyword[0].toUpperCase()) {
                         // first letter is uppercase, search inside detailedItems.
                         var shipNames = Object.keys(ship_db);
                         shipNames.forEach(function (name) {
-                            if (ship_db[name]['detailedItems'][searchByKeyword].toLowerCase().indexOf(searchTarget.toLowerCase()) !== -1){
+                            if (ship_db[name]['detailedItems'][searchByKeyword].toLowerCase().indexOf(searchTarget.toLowerCase()) !== -1) {
                                 var newListElement = $('<li></li>');
                                 newListElement.addClass('collection-item');
-                                newListElement.click(function(){
+                                newListElement.click(function () {
                                     renderShipDisplayCase(name);
                                 });
                                 newListElement.html('<a onclick="renderShipDisplayCase(\'' + name + '\')" style=\'color: black; text-decoration: none; cursor: pointer;\'>' + name + '</a>');
@@ -534,14 +558,14 @@ Developed by Chen Zheng (@HotFireyDeath)
                             }
                         });
                     }
-                    else{
+                    else {
                         // same type of search, but perform outside detailedItems.
                         var shipNames = Object.keys(ship_db);
                         shipNames.forEach(function (name) {
-                            if (ship_db[name][searchByKeyword].toLowerCase().indexOf(searchTarget.toLowerCase()) !== -1){
+                            if (ship_db[name][searchByKeyword].toLowerCase().indexOf(searchTarget.toLowerCase()) !== -1) {
                                 var newListElement = $('<li></li>');
                                 newListElement.addClass('collection-item');
-                                newListElement.click(function(){
+                                newListElement.click(function () {
                                     renderShipDisplayCase(name);
                                 });
                                 newListElement.html('<a onclick="renderShipDisplayCase(\'' + name + '\')" style=\'color: black; text-decoration: none; cursor: pointer;\'>' + name + '</a>');
@@ -554,7 +578,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                     var helpData = {
                         "regular search": "Enter text and search results will appear based on ship name.",
                         "compare": "Compares named ships' stats. <a onclick='$(\"#search\").val(\"compare prinz eugen, belfast, universal bullin\");' style='cursor: pointer;'>Click for an example</a>",
-                        "allsearchablecomponents" : "Gives a list of searchable keywords, with examples built in.",
+                        "allsearchablecomponents": "Gives a list of searchable keywords, with examples built in.",
                         "help": "Shows all possible commands."
                     };
                     for (var name in helpData) {
@@ -564,7 +588,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                         searchResult.append(newListElement);
                     }
                 }
-                else if (omnisearch.toLowerCase() === 'allsearchablecomponents'){
+                else if (omnisearch.toLowerCase() === 'allsearchablecomponents') {
                     var allComps = $('<li></li>');
                     allComps.addClass('collection-item');
                     allComps.html('<b>Search format is [component]: search. All searchable components: </b>');
@@ -576,7 +600,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                         searchResult.append(c);
                     });
                 }
-                else if (omnisearch.toLowerCase().indexOf('compare') !== -1){
+                else if (omnisearch.toLowerCase().indexOf('compare') !== -1) {
                     var newListElement = $('<li></li>');
                     newListElement.addClass('collection-item');
                     newListElement.html("<b>Compare functionality currently not added. Please check back later.</b> ( O w O ) /");
@@ -588,7 +612,7 @@ Developed by Chen Zheng (@HotFireyDeath)
                         if (item.toLowerCase().indexOf(omnisearch.toLowerCase()) !== -1) {
                             // add to search_results
                             var newListElement = $('<li></li>');
-                            newListElement.click(function() {
+                            newListElement.click(function () {
                                 renderShipDisplayCase(item);
                             });
                             newListElement.css('cursor', 'pointer');
