@@ -92,9 +92,13 @@ http://czheng.me
 <div id="ship_displayCase" style="display: none;">
     <div class="container">
         <p id="ship_displayCase_rawData"></p> <!-- rawData div will only be filled for development purpose. -->
+        
+        <!-- ship name -->
         <h4 id="ship_displayCase_name" style="text-align: center;" onclick="checkClick();"></h4>
+        <!-- ship skin display -->
         <div class="imgbox"><img onclick="displaySkinModal();" class="center-fit" id="ship_displayCase_skinpicture"
                                  src="https://azurlane.koumakan.jp/w/images/0/06/Akagi.png"></div>
+        <!-- ship basic info -->
         <ul class="collection">
             <li id="ship_displayCase_nationality" class="collection-item"></li>
             <li id="ship_displayCase_rarity" class="collection-item"></li>
@@ -107,6 +111,30 @@ http://czheng.me
                 <small>Click for misc. info</small>
             </li>
         </ul>
+        
+        <!-- CONCEPT WIP 
+        <div class="card horizontal">
+            <div class="card-image">
+                <img class="activator" src="https://azurlane.koumakan.jp/w/images/2/22/AyanamiIcon.png">
+            </div>
+            <div class="card-content">
+                <span class="card-title activator">Level 100</span>
+                <a class="waves-effect waves-blue btn-flat">Select status</a>
+                <ul class="collection">
+                    <li class="collection-item avatar">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png" class="circle">
+                        <span class="title">Firepower</span>
+                        <p>57 (D)</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-reveal">
+                <span class="card-title grey-text text-darken-4">Card Title <i class="fas fa-times right"></i></span>
+                <p>Here is some more information about this product that is only revealed once clicked on.</p>
+            </div>
+        </div>
+        
+        -->
     </div>
 </div>
 
@@ -163,8 +191,9 @@ http://czheng.me
     var phrase = $("#loading_pleaseWait_phrase");
     phrase.html(phrase.html() + loadingRandoms[randomKey]);
 
-
-    // An object containing the URL to useful icons.
+https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png
+ class="circle">
+ <span class="title">Firepower// An object containing the URL to useful icons.
     var icons = {
         "firepower": "https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png",
         "health": "https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png",
@@ -346,6 +375,7 @@ http://czheng.me
         VAchunk = decodeURIComponent(VAchunk);
         var VAlink = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(VAchunk);
         $('#miscInfoModal_voiceActress').html("<small>Voice Actress</small> <a target='_blank' href='" + VAlink + "'>" + VAchunk.replace('_', ' ') + "</a>");
+        
     }
 
     /**
