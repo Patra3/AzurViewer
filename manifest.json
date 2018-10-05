@@ -1,0 +1,14 @@
+{
+  "short_name" : "AzurViewer",
+  "name" : "AzurViewer",
+  "icons" : [
+    {
+      "src" : "icon.png",
+      "type" : "image/png",
+      "sizes" : "116x116"
+    }
+  ],
+  "background_color" : "#007FFF",
+  "display" : "standalone",
+  "theme_color" : "#007FFF"
+}

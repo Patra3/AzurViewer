@@ -13,6 +13,7 @@ http://czheng.me
     <title>AzurViewer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="/manifest.json">
 
     <!-- FONT AWESOME -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
@@ -27,6 +28,9 @@ http://czheng.me
     <!-- MATERIALIZE -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- LOCALFORAGE -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.7.2/localforage.min.js"></script>
 
     <style>
         body {
@@ -53,6 +57,10 @@ http://czheng.me
             max-height: 100vh;
             margin: auto;
         }
+
+        a {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -73,7 +81,7 @@ http://czheng.me
     <ul class="collection" id="search_results" style="display: none;"></ul>
 </div>
 
-<div id="loading_pleaseWait">
+<div id="loading_pleaseWait" style="display: none;">
     <div class="container">
         <div class="card horizontal">
             <div class="card-image">
@@ -92,7 +100,7 @@ http://czheng.me
 <div id="ship_displayCase" style="display: none;">
     <div class="container">
         <p id="ship_displayCase_rawData"></p> <!-- rawData div will only be filled for development purpose. -->
-        
+
         <!-- ship name -->
         <h4 id="ship_displayCase_name" style="text-align: center;" onclick="checkClick();"></h4>
         <!-- ship skin display -->
@@ -111,74 +119,83 @@ http://czheng.me
                 <small>Click for misc. info</small>
             </li>
         </ul>
-        
+
         <!-- ship stats -->
         <div class="card">
             <div class="card-tabs">
-              <ul class="tabs tabs-fixed-width">
-                <li class="tab"><a href="#test4">Lv. 100 Retrofit</a></li>
-                <li class="tab"><a href="#test5">Lv. 100</a></li>
-                <li class="tab"><a href="#test5">Lv. 120 Retrofit</a></li>
-                <li class="tab"><a href="#test5">Lv. 120</a></li>
-                <li class="tab"><a href="#test6">Base</a></li>
-              </ul>
+                <ul class="tabs tabs-fixed-width">
+                    <li class="tab"><a onclick="changeStats('Kai');">Lv. 100 Retrofit</a></li>
+                    <li class="tab"><a onclick="changeStats('Max');">Lv. 100</a></li>
+                    <li class="tab"><a onclick="changeStats('Kai120');">Lv. 120 Retrofit</a></li>
+                    <li class="tab"><a onclick="changeStats('120');">Lv. 120</a></li>
+                    <li class="tab"><a onclick="changeStats('Initial');">Base</a></li>
+                </ul>
             </div>
             <div class="card-content grey lighten-4">
                 <ul class="collection">
                     <li class="collection-item avatar">
-                        <img src="https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png" class="circle">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png"
+                             class="circle">
                         <span class="title">Health</span>
                         <p id="ship_displayCase_health"></p>
                     </li>
                     <li class="collection-item avatar">
-                        <img src="https://azurlane.koumakan.jp/w/images/thumb/0/06/Armor.png/25px-Armor.png" class="circle">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/0/06/Armor.png/25px-Armor.png"
+                             class="circle">
                         <span class="title">Armor Type</span>
                         <p id="ship_displayCase_armorType"></p>
                     </li>
                     <li class="collection-item avatar">
-                        <img src="https://azurlane.koumakan.jp/w/images/thumb/e/e3/Refill.png/25px-Refill.png" class="circle">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/e/e3/Refill.png/25px-Refill.png"
+                             class="circle">
                         <span class="title">Reload</span>
                         <p id="ship_displayCase_reload"></p>
                     </li>
                     <li class="collection-item avatar">
-                        <img src="https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png" class="circle">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png"
+                             class="circle">
                         <span class="title">Firepower</span>
-                        <p id="ship_displayCase_firepower"></p>
+                        <p id="ship_displayCase_fire"></p>
                     </li>
                     <li class="collection-item avatar">
-                        <img src="https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png" class="circle">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png"
+                             class="circle">
                         <span class="title">Torpedo</span>
-                        <p id="ship_displayCase_torpedo"></p>
+                        <p id="ship_displayCase_torp"></p>
                     </li>
                     <li class="collection-item avatar">
-                        <img src="https://azurlane.koumakan.jp/w/images/thumb/d/d2/Evasion.png/25px-Evasion.png" class="circle">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/d/d2/Evasion.png/25px-Evasion.png"
+                             class="circle">
                         <span class="title">Evasion</span>
-                        <p id="ship_displayCase_evasion"></p>
+                        <p id="ship_displayCase_evade"></p>
                     </li>
                     <li class="collection-item avatar">
-                        <img src="https://azurlane.koumakan.jp/w/images/thumb/0/0f/AntiAir.png/25px-AntiAir.png" class="circle">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/0/0f/AntiAir.png/25px-AntiAir.png"
+                             class="circle">
                         <span class="title">Anti-Air</span>
-                        <p id="ship_displayCase_antiAir"></p>
+                        <p id="ship_displayCase_aa"></p>
                     </li>
                     <li class="collection-item avatar">
-                        <img src="https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png" class="circle">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png"
+                             class="circle">
                         <span class="title">Air Power</span>
-                        <p id="ship_displayCase_airPower"></p>
+                        <p id="ship_displayCase_air"></p>
                     </li>
                     <li class="collection-item avatar">
-                        <img src="https://azurlane.koumakan.jp/w/images/thumb/9/90/Consumption.png/25px-Consumption.png" class="circle">
+                        <img src="https://azurlane.koumakan.jp/w/images/thumb/9/90/Consumption.png/25px-Consumption.png"
+                             class="circle">
                         <span class="title">Oil consumption</span>
-                        <p id="ship_displayCase_oilConsumption"></p>
+                        <p id="ship_displayCase_consumption"></p>
                     </li>
                     <li class="collection-item avatar">
                         <img src="https://azurlane.koumakan.jp/w/images/thumb/1/16/ASW.png/25px-ASW.png" class="circle">
                         <span class="title">Anti-submarine warfare</span>
-                        <p id="ship_displayCase_antiSubmarineWarfare"></p>
+                        <p id="ship_displayCase_asw"></p>
                     </li>
                 </ul>
             </div>
         </div>
-        
+
     </div>
 </div>
 
@@ -406,17 +423,49 @@ http://czheng.me
         VAchunk = decodeURIComponent(VAchunk);
         var VAlink = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(VAchunk);
         $('#miscInfoModal_voiceActress').html("<small>Voice Actress</small> <a target='_blank' href='" + VAlink + "'>" + VAchunk.replace('_', ' ') + "</a>");
-        
+
+        changeStats('Max');
     }
 
     /**
      * Changes the stats shown in the 'display case' for the ship.
-     * type is a proper identifier such as 'base', '100', 'kai', '120', 'kai120'.
+     * type is a proper identifier such as 'Initial' or 'Kai120'.
      */
-    function changeStats(type){
-        
+    function changeStats(type) {
+
+        // TO-DO: Detect if retrofit doesn't exist, and hide dialogues or something. Right now it looks as if there was data loading failure.
+
+        var needChunk = ship_db[document.title]['detailedItems'];
+        var gradeSuffix = 'Grade' + type;
+        if ((type === 'Initial') || (type === 'Max') || (type === '120')) gradeSuffix = 'Grade';
+        $('#ship_displayCase_armorType').text(needChunk['Armor']); // armor should be constant on all ships...
+        var statItems = ['Torp', 'Fire', 'AA', 'Reload', 'Consumption', 'Air', 'Health', 'Evade', 'ASW'];
+        statItems.forEach(function (item) {
+            var gradeFilter = '(' + needChunk[item + gradeSuffix] + ')';
+
+            // key exceptions (key item prefix is different than the others)
+            if (item === 'Torp') {
+                gradeFilter = '(' + needChunk[item + 'edo' + gradeSuffix] + ')';
+            }
+            else if (item === 'Air') {
+                gradeFilter = '(' + needChunk['Aviation' + gradeSuffix] + ')';
+            }
+            else if (item === 'Evade') {
+                gradeFilter = '(' + needChunk['Evasion' + gradeSuffix] + ')';
+            }
+            // exception cases
+            if (
+                (item === 'Reload') ||
+                (item === 'ASW') ||
+                (item === 'Consumption')
+            ) {
+                gradeFilter = '';
+            }
+
+            $('#ship_displayCase_' + item.toLowerCase()).text(needChunk[item + type] + ' ' + gradeFilter);
+        });
     }
-    
+
     /**
      * Parses the list of ships given the wikimedia HTML parse data for https://azurlane.koumakan.jp/List_of_Ships.
      * This is hard-coded, and therefore is subject to breaking. Will attempt to update as often as possible.
@@ -425,6 +474,7 @@ http://czheng.me
      */
     function parseListOfShips(data) {
         var ships = {};
+
         // Parse ship's 'top layer' data using List of Ships Azur Wiki result.
         for (var i = 0; i < data.length; i++) {
             if ((i + 1) < data.length) { // Check for out of bounds.
@@ -520,11 +570,26 @@ http://czheng.me
             $("#loading_pleaseWait_percentage").text(Math.round((parseInt(localStorage.getItem('dataFetched')) / parseFloat(localStorage.getItem('fullDataAmount'))) * 100) + "% done");
             if (localStorage.getItem('dataFetched') === localStorage.getItem('fullDataAmount')) {
 
+                localStorage.removeItem('dataFetched');
+                localStorage.removeItem('fullDataAmount');
+
                 // All data received, now parse and render.
                 document.title = "AzurViewer";
                 $("#loading_pleaseWait").hide();
                 $("#omnisearch").show();
                 ship_db = ships;
+
+                // Attempt to cache data locally (reduces load times after initial loading)
+                localforage.setItem('az_ship', JSON.stringify(ship_db), function(error){
+                    if (error !== null){
+                        alert("Error while attempting to cache ship data.");
+                    }
+                });
+                localforage.setItem('az_resource', JSON.stringify(resource_db), function(error){
+                    if (error !== null){
+                        alert("Error while attempting to cache resource data.");
+                    }
+                });
 
                 clearInterval(interval);
             }
@@ -535,20 +600,56 @@ http://czheng.me
         }, 500);
     }
 
-    $.ajax({
-        url: "https://azurlane.koumakan.jp/w/api.php",
-        method: "GET",
-        dataType: "jsonp",
-        data: {
-            action: "parse",
-            page: "List_of_Ships",
-            format: "json"
-        },
-        success: function (data) {
-            // text variable contains a fragment of HTML.
-            var text = data['parse']['text']['*'];
-            text = text.split("<");
-            parseListOfShips(text);
+    // Starting method of application (w/o cache). Starts by fetching a list of ships.
+    function start(){
+        $.ajax({
+            url: "https://azurlane.koumakan.jp/w/api.php",
+            method: "GET",
+            dataType: "jsonp",
+            data: {
+                action: "parse",
+                page: "List_of_Ships",
+                format: "json"
+            },
+            success: function (data) {
+                // text variable contains a fragment of HTML.
+                var text = data['parse']['text']['*'];
+                text = text.split("<");
+                $('#loading_pleaseWait').show();
+                parseListOfShips(text);
+            }
+        });
+    }
+
+    // Starting point w. cache. Load cache and start application. Typically this is where the application is expected to start from...
+    localforage.getItem('az_ship', function(error, value){
+        if (error !== null) {
+            alert("Error while attempting to load cached ship data.");
+            start();
+        }
+        else if (value === null){
+            // No data exists!
+            start();
+        }
+        else{
+            localforage.getItem('az_resource', function(error2, value2){
+                if (error2 !== null){
+                    alert("Error while attempting to load cached resource data.");
+                    start();
+                }
+                else if (value2 === null){
+                    start();
+                }
+                else{
+                    ship_db = JSON.parse(value);
+                    resource_db = JSON.parse(value2);
+
+                    // Cache should be loaded.
+                    document.title = "AzurViewer";
+                    $("#loading_pleaseWait").hide();
+                    $("#omnisearch").show();
+                }
+            });
         }
     });
 
