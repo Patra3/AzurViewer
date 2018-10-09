@@ -326,7 +326,11 @@ http://czheng.me
                 (fileName.indexOf('22200') === -1) &&
                 (fileName.indexOf('22260') === -1) &&
                 (fileName.indexOf('32200') === -1) &&
-                (fileName.indexOf('Piccy1_mod5_neuerenderframe_s22a') === -1)
+                (fileName.indexOf('Piccy1_mod5_neuerenderframe_s22a') === -1) &&
+                (fileName.indexOf('portrait') === -1) &&
+                (fileName.indexOf('Portrait') === -1) &&
+                (fileName.indexOf('Star') === -1) &&
+                (fileName.indexOf('Express') === -1)
             ) {
                 var extension = fileName.split('.').pop(); // gets the file extension.
                 if (extension === 'png') {
@@ -400,14 +404,26 @@ http://czheng.me
         var rarityColorTypes = {
             "Normal": "lightgray",
             "Rare": "lightblue",
-            "Elite": "mediumpurple",
-            "Super Rare": "gold"
+            "Elite": "#B19CD9",
+            "Super Rare": "#FFE974"
         };
         var n = $("#ship_displayCase_nationality");
         n.css("background-color", nationalityColorTypes[nationality]);
         n.html("<small>Nationality</small> " + nationality);
         var r = $("#ship_displayCase_rarity");
-        r.css("background-color", rarityColorTypes[rarity]);
+        if (rarity === "Ultra Rare"){
+        	// Ultra Rare gradient (very close to wiki gradient).
+        	r.css({
+        		'background-image' : 'linear-gradient(to right, pink, #CCFFFF, lightblue)',
+        		'background-color' : ''
+        	});
+        }
+        else {
+        	r.css({
+        		"background-color" : rarityColorTypes[rarity],
+        		'background-image' : ''
+        	});
+        }
         r.html("<small>Rarity</small> " + rarity);
         $("#ship_displayCase_constructionTime").html("<small>Construction Time</small> " + constructionTime);
         $("#ship_displayCase_class").html("<small>Class</small> " + clas);
@@ -442,7 +458,7 @@ http://czheng.me
         var statItems = ['Torp', 'Fire', 'AA', 'Reload', 'Consumption', 'Air', 'Health', 'Evade', 'ASW'];
         statItems.forEach(function (item) {
             var gradeFilter = '(' + needChunk[item + gradeSuffix] + ')';
-
+            
             // key exceptions (key item prefix is different than the others)
             if (item === 'Torp') {
                 gradeFilter = '(' + needChunk[item + 'edo' + gradeSuffix] + ')';
@@ -453,6 +469,7 @@ http://czheng.me
             else if (item === 'Evade') {
                 gradeFilter = '(' + needChunk['Evasion' + gradeSuffix] + ')';
             }
+            
             // exception cases
             if (
                 (item === 'Reload') ||
@@ -460,6 +477,10 @@ http://czheng.me
                 (item === 'Consumption')
             ) {
                 gradeFilter = '';
+            }
+            
+            if (gradeFilter.length < 3){
+            	gradeFilter = '';
             }
 
             $('#ship_displayCase_' + item.toLowerCase()).text(needChunk[item + type] + ' ' + gradeFilter);
