@@ -195,7 +195,6 @@ http://czheng.me
                 </ul>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -330,7 +329,8 @@ http://czheng.me
                 (fileName.indexOf('portrait') === -1) &&
                 (fileName.indexOf('Portrait') === -1) &&
                 (fileName.indexOf('Star') === -1) &&
-                (fileName.indexOf('Express') === -1)
+                (fileName.indexOf('Express') === -1) &&
+                (fileName.indexOf('SUnit') === -1)
             ) {
                 var extension = fileName.split('.').pop(); // gets the file extension.
                 if (extension === 'png') {
@@ -769,7 +769,7 @@ http://czheng.me
                     var helpData = {
                         "regular search": "Enter text and search results will appear based on ship name.",
                         "compare": "Compares named ships' stats. <a onclick='$(\"#search\").val(\"compare prinz eugen, belfast, universal bullin\");' style='cursor: pointer;'>Click for an example</a>",
-                        "allsearchablecomponents": "Gives a list of searchable keywords, with examples built in.",
+                        "allsearchablecomponents (or asc)": "Gives a list of searchable keywords, with examples built in.",
                         "help": "Shows all possible commands."
                     };
                     for (var name in helpData) {
@@ -779,7 +779,7 @@ http://czheng.me
                         searchResult.append(newListElement);
                     }
                 }
-                else if (omnisearch.toLowerCase() === 'allsearchablecomponents') {
+                else if ((omnisearch.toLowerCase() === 'allsearchablecomponents') || (omnisearch.toLowerCase() === 'asc')){
                     var allComps = $('<li></li>');
                     allComps.addClass('collection-item');
                     allComps.html('<b>Search format is [component]: search. All searchable components: </b>');
