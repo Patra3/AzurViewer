@@ -131,7 +131,7 @@ http://czheng.me
                     <li class="tab"><a onclick="changeStats('Initial');">Base</a></li>
                 </ul>
             </div>
-            <div class="card-content grey lighten-4">
+            <div class="card-content grey lighten-5">
                 <ul class="collection">
                     <li class="collection-item avatar">
                         <img src="https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png"
@@ -200,6 +200,9 @@ http://czheng.me
                 </ul>
             </div>
         </div>
+        
+        <!-- ship equipment slots -->
+        <div class="card-panel" id="ship_displayCase_equipmentPanel"></div>
         
     </div>
 </div>
@@ -465,10 +468,47 @@ http://czheng.me
         .replace('{{Aviation}}', '')
         .replace('{{RoF}}', '')
         .split('  ');
-        
         // reinforce, scrapIncome
         $('#ship_displayCase_reinforce').html('<small>Reinforcement Value</small> ' + reinforcementValues[0] + ' ' + fphtml + ', ' + reinforcementValues[1] + ' ' + torphtml + ', ' + reinforcementValues[2] + ' ' + aviahtml + ', ' + reinforcementValues[3] + ' ' + reloadhtml);
         $('#ship_displayCase_scrapIncome').html('<small>Scrap Income</small> ' + scrapValues[0] + ' ' + coinhtml + ', ' + scrapValues[1] + ' ' + oilhtml + ', ' + scrapValues[2] + ' ' + medalhtml);
+        
+        // Ship equipment.
+        $('#ship_displayCase_equipmentPanel').empty();
+        $('#ship_displayCase_equipmentPanel').html("<h6>Equipment</h6><div class=\"row\"><div class=\"col s4\"><b>Slot</b></div><div class=\"col s4\"><b>Efficiency</b></div><div class=\"col s4\"><b>Equippable</b></div></div>");
+        var ableToRender = [];
+        for (var i = 1; i <= 5; i++){
+            if (('Eq' + i + 'EffInit' in shipChunk['detailedItems']) && ('Eq' + i + 'EffInitMax' in shipChunk['detailedItems'])){
+                // Both EffInit and EffMax keys exist, check if they are full and add to render array if full.
+                if ((shipChunk['detailedItems']['Eq' + i + 'EffInit'].length > 0) && (shipChunk['detailedItems']['Eq' + i + 'EffInitMax'].length > 0)){
+                    ableToRender.push('Eq' + i);
+                }
+            }
+        }
+        ableToRender.forEach(function(item, index){
+            var row = $('<div></div>');
+            row.addClass('row');
+            
+            // Create the three col items.
+            var slotNum = $('<div></div>');
+            slotNum.addClass('col s4');
+            slotNum.html(index);
+            
+            var efficiencyVal = $('<div></div>');
+            efficiencyVal.addClass('col s4');
+            efficiencyVal.html(shipChunk['detailedItems'][item + 'EffInit'] + '/' + shipChunk['detailedItems'][item + 'EffInitMax']);
+            if ((item + 'EffInitKai' in shipChunk['detailedItems']) && (shipChunk['detailedItems'][item + 'EffInitKai'].length > 0)){
+                efficiencyVal.html(efficiencyVal.html() + '/' + shipchunk['detailedItems'][item + 'EffInitKai']);
+            }
+            
+            var equipType = $('<div></div>');
+            equipType.addClass('col s4');
+            equipType.html(shipChunk['detailedItems'][item + 'Type']);
+            
+            // Append the three to row, and then append row to panel. Redo for possible of 5 times per ship.
+            row.append(slotNum, efficiencyVal, equipType);
+            $('#ship_displayCase_equipmentPanel').append(row);
+        });
+        
         changeStats('Max');
     }
 
