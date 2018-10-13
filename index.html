@@ -200,10 +200,24 @@ http://czheng.me
                 </ul>
             </div>
         </div>
-        
+
         <!-- ship equipment slots -->
-        <div class="card-panel" id="ship_displayCase_equipmentPanel"></div>
-        
+
+        <!-- collection and voice lines collapsible -->
+        <ul class="collapsible">
+            <li>
+                <div class="collapsible-header"><i class="fas fa-wrench"></i> Equipment</div>
+                <div class="collapsible-body" id="ship_displayCase_equipmentPanel"></div>
+            </li>
+            <li>
+                <div class="collapsible-header"><i class="fas fa-cogs"></i> Construction</div>
+                <div class="collapsible-body"><i>Coming soon...</i> <!-- WIP --></div>
+            </li>
+            <li>
+                <div class="collapsible-header"><i class="far fa-comment"></i> Voice Lines</div>
+                <div class="collapsible-body"><i>Coming soon...</i> <!-- WIP --></div>
+            </li>
+        </ul>
     </div>
 </div>
 
@@ -221,6 +235,10 @@ http://czheng.me
             <li id="miscInfoModal_artist" class="collection-item"></li>
             <li id="miscInfoModal_voiceActress" class="collection-item"></li>
         </ul>
+        <button class="waves-effect waves-blue btn-flat"
+                onclick="window.open('https://azurlane.koumakan.jp/' + document.title.replace(/ /g, '_'), '_blank');">
+            Open in Wiki
+        </button>
     </div>
 </div>
 
@@ -230,13 +248,22 @@ http://czheng.me
     var devClicks = 0;
 
     function checkClick() {
-        if (devClicks === 10) {
+        if (devClicks === 20) {
+
             $("#ship_displayCase_rawData").text(JSON.stringify(ship_db[document.title]));
             devClicks = 0;
         }
         else {
             devClicks++;
         }
+    }
+
+    /**
+     * Gets the key corresponding to the value in object.
+     * Original solution found here: https://stackoverflow.com/a/28191966
+     */
+    function getKeyByValue(object, value) {
+        return Object.keys(object).find(key => object[key] === value);
     }
 
     // Set random loading character and 'slogan'.
@@ -296,58 +323,41 @@ http://czheng.me
         // Search and list all skins.
         var shipName = document.title.replace(/ /g, "_");
         for (var fileName in resource_db) {
-            if (
-                (fileName.indexOf(shipName) !== -1) &&
-                (fileName.indexOf('Chibi') === -1) &&
-                (fileName.indexOf('Icon') === -1) &&
-                (fileName.indexOf('Banner') === -1) &&
-                (fileName.indexOf('Questline') === -1) &&
-                (fileName.indexOf('head') === -1) &&
-                (fileName.indexOf('Title') === -1) &&
-                (fileName.indexOf('shopskin') === -1) &&
-                (fileName.indexOf('Card') === -1) &&
-                (fileName.indexOf('Emblem') === -1) &&
-                (fileName.indexOf('event') === -1) &&
-                (fileName.indexOf('Event_CN') === -1) &&
-                (fileName.indexOf('Event_JP') === -1) &&
-                (fileName.indexOf('Furniture') === -1) &&
-                (fileName.indexOf('quest') === -1) &&
-                (fileName.indexOf('Event') === -1) &&
-                (fileName.indexOf('SBS') === -1) &&
-                (fileName.indexOf('Skill') === -1) &&
-                (fileName.indexOf('Defense') === -1) &&
-                (fileName.indexOf('Ddskins') === -1) &&
-                (fileName.indexOf('Offense') === -1) &&
-                (fileName.indexOf('Support') === -1) &&
-                (fileName.indexOf('plushie') === -1) &&
-                (fileName.indexOf('33000') === -1) &&
-                (fileName.indexOf('33060') === -1) &&
-                (fileName.indexOf('91033') === -1) &&
-                (fileName.indexOf('91133') === -1) &&
-                (fileName.indexOf('skill') === -1) &&
-                (fileName.indexOf('2200') === -1) &&
-                (fileName.indexOf('42200') === -1) &&
-                (fileName.indexOf('91022') === -1) &&
-                (fileName.indexOf('91122') === -1) &&
-                (fileName.indexOf('22000') === -1) &&
-                (fileName.indexOf('22100') === -1) &&
-                (fileName.indexOf('22200') === -1) &&
-                (fileName.indexOf('22260') === -1) &&
-                (fileName.indexOf('32200') === -1) &&
-                (fileName.indexOf('Piccy1_mod5_neuerenderframe_s22a') === -1) &&
-                (fileName.indexOf('portrait') === -1) &&
-                (fileName.indexOf('Portrait') === -1) &&
-                (fileName.indexOf('Star') === -1) &&
-                (fileName.indexOf('Express') === -1) &&
-                (fileName.indexOf('SUnit') === -1)
-            ) {
+            if (fileName.indexOf(shipName) !== -1) {
                 var extension = fileName.split('.').pop(); // gets the file extension.
                 if (extension === 'png') {
-                    var parent = document.getElementById('skinModal_list');
-                    var child = document.createElement('LI');
-                    child.className = 'collection-item';
-                    child.innerHTML = '<a onclick="forceSkin(\'' + fileName + '\');" style="color: black; text-decoration: none; cursor: pointer;">' + fileName.replace('.png', ' ') + '</a>';
-                    parent.appendChild(child);
+                    var filter = false; // If picture matches filter, we can add to skin list.
+
+                    var skinName = fileName.replace('.png', ' ');
+                    skinName = skinName.replace(document.title.replace(/ /g, "_"), '');
+                    if (skinName.trim().length > 0) {
+                        var sufKey = getKeyByValue(ship_db[document.title]['detailedItems'], skinName.trim());
+                        if (sufKey && (sufKey.indexOf('Suffix') !== -1)) {
+                            skinName = ship_db[document.title]['detailedItems'][sufKey.replace('Suffix', 'Name')];
+                            filter = true;
+                        }
+                        else {
+                            if ((skinName.indexOf('Kai') !== -1) && (skinName.replace('Kai', '').replace(document.title.replace(/ /g, "_"), '').trim().length === 0)) {
+                                skinName = "Retrofit";
+                                filter = true;
+                            }
+                        }
+                    }
+                    else {
+                        skinName = fileName.replace('.png', ' ');
+                        if (skinName.trim() === document.title.replace(/ /g, "_")) {
+                            skinName = "Default";
+                            filter = true;
+                        }
+                    }
+
+                    if (filter) {
+                        var parent = document.getElementById('skinModal_list');
+                        var child = document.createElement('LI');
+                        child.className = 'collection-item';
+                        child.innerHTML = '<a onclick="forceSkin(\'' + fileName + '\');" style="color: black; text-decoration: none; cursor: pointer;">' + skinName + '</a>';
+                        parent.appendChild(child);
+                    }
                 }
             }
         }
@@ -420,18 +430,18 @@ http://czheng.me
         n.css("background-color", nationalityColorTypes[nationality]);
         n.html("<small>Nationality</small> " + nationality);
         var r = $("#ship_displayCase_rarity");
-        if (rarity === "Ultra Rare"){
-        	// Ultra Rare gradient (very close to wiki gradient).
-        	r.css({
-        		'background-image' : 'linear-gradient(to right, #FFB2B2, #F5D4BC, #FFF4A5, #C9FD94, #AEDDFF, #CAAEFF)',
-        		'background-color' : ''
-        	});
+        if (rarity === "Ultra Rare") {
+            // Ultra Rare gradient (very close to wiki gradient).
+            r.css({
+                'background-image': 'linear-gradient(to right, #FFB2B2, #F5D4BC, #FFF4A5, #C9FD94, #AEDDFF, #CAAEFF)',
+                'background-color': ''
+            });
         }
         else {
-        	r.css({
-        		"background-color" : rarityColorTypes[rarity],
-        		'background-image' : ''
-        	});
+            r.css({
+                "background-color": rarityColorTypes[rarity],
+                'background-image': ''
+            });
         }
         r.html("<small>Rarity</small> " + rarity);
         $("#ship_displayCase_constructionTime").html("<small>Construction Time</small> " + constructionTime);
@@ -458,57 +468,58 @@ http://czheng.me
         var oilhtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/f/f2/Oilicon.png/25px-Oilicon.png">';
         var medalhtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/3/33/Medalicon.png/20px-Medalicon.png">';
         var scrapValues = shipChunk['detailedItems']['ScrapIncome']
-        .replace('{{coin}}', '')
-        .replace('{{oil}}', '')
-        .replace('{{Medal}}', '')
-        .split(' ');
+            .replace('{{coin}}', '')
+            .replace('{{oil}}', '')
+            .replace('{{Medal}}', '')
+            .split(' ');
         var reinforcementValues = shipChunk['detailedItems']['ReinforcementValue']
-        .replace('{{Firepower}}', '')
-        .replace('{{Torpedo}}', '')
-        .replace('{{Aviation}}', '')
-        .replace('{{RoF}}', '')
-        .split('  ');
+            .replace('{{Firepower}}', '')
+            .replace('{{Torpedo}}', '')
+            .replace('{{Aviation}}', '')
+            .replace('{{RoF}}', '')
+            .split('  ');
         // reinforce, scrapIncome
         $('#ship_displayCase_reinforce').html('<small>Reinforcement Value</small> ' + reinforcementValues[0] + ' ' + fphtml + ', ' + reinforcementValues[1] + ' ' + torphtml + ', ' + reinforcementValues[2] + ' ' + aviahtml + ', ' + reinforcementValues[3] + ' ' + reloadhtml);
         $('#ship_displayCase_scrapIncome').html('<small>Scrap Income</small> ' + scrapValues[0] + ' ' + coinhtml + ', ' + scrapValues[1] + ' ' + oilhtml + ', ' + scrapValues[2] + ' ' + medalhtml);
-        
+
         // Ship equipment.
-        $('#ship_displayCase_equipmentPanel').empty();
-        $('#ship_displayCase_equipmentPanel').html("<h6>Equipment</h6><div class=\"row\"><div class=\"col s4\"><b>Slot</b></div><div class=\"col s4\"><b>Efficiency</b></div><div class=\"col s4\"><b>Equippable</b></div></div>");
+        var ep = $('#ship_displayCase_equipmentPanel');
+        ep.empty();
+        ep.html("<div class=\"row\"><div class=\"col s4\"><b>Slot</b></div><div class=\"col s4\"><b>Efficiency</b></div><div class=\"col s4\"><b>Equippable</b></div></div>");
         var ableToRender = [];
-        for (var i = 1; i <= 5; i++){
-            if (('Eq' + i + 'EffInit' in shipChunk['detailedItems']) && ('Eq' + i + 'EffInitMax' in shipChunk['detailedItems'])){
+        for (var i = 1; i <= 5; i++) {
+            if (('Eq' + i + 'EffInit' in shipChunk['detailedItems']) && ('Eq' + i + 'EffInitMax' in shipChunk['detailedItems'])) {
                 // Both EffInit and EffMax keys exist, check if they are full and add to render array if full.
-                if ((shipChunk['detailedItems']['Eq' + i + 'EffInit'].length > 0) && (shipChunk['detailedItems']['Eq' + i + 'EffInitMax'].length > 0)){
+                if ((shipChunk['detailedItems']['Eq' + i + 'EffInit'].length > 0) && (shipChunk['detailedItems']['Eq' + i + 'EffInitMax'].length > 0)) {
                     ableToRender.push('Eq' + i);
                 }
             }
         }
-        ableToRender.forEach(function(item, index){
+        ableToRender.forEach(function (item, index) {
             var row = $('<div></div>');
             row.addClass('row');
-            
+
             // Create the three col items.
             var slotNum = $('<div></div>');
             slotNum.addClass('col s4');
             slotNum.html(index);
-            
+
             var efficiencyVal = $('<div></div>');
             efficiencyVal.addClass('col s4');
             efficiencyVal.html(shipChunk['detailedItems'][item + 'EffInit'] + '/' + shipChunk['detailedItems'][item + 'EffInitMax']);
-            if ((item + 'EffInitKai' in shipChunk['detailedItems']) && (shipChunk['detailedItems'][item + 'EffInitKai'].length > 0)){
-                efficiencyVal.html(efficiencyVal.html() + '/' + shipchunk['detailedItems'][item + 'EffInitKai']);
+            if ((item + 'EffInitKai' in shipChunk['detailedItems']) && (shipChunk['detailedItems'][item + 'EffInitKai'].length > 0)) {
+                efficiencyVal.html(efficiencyVal.html() + '/' + shipChunk['detailedItems'][item + 'EffInitKai']);
             }
-            
+
             var equipType = $('<div></div>');
             equipType.addClass('col s4');
             equipType.html(shipChunk['detailedItems'][item + 'Type']);
-            
+
             // Append the three to row, and then append row to panel. Redo for possible of 5 times per ship.
             row.append(slotNum, efficiencyVal, equipType);
-            $('#ship_displayCase_equipmentPanel').append(row);
+            ep.append(row);
         });
-        
+
         changeStats('Max');
     }
 
@@ -519,34 +530,34 @@ http://czheng.me
     function changeStats(type) {
 
         var needChunk = ship_db[document.title]['detailedItems'];
-        
+
         // Display the speed value dependent only on kai or normal.
         var speed = needChunk['Speed'];
-        if (type.indexOf('Kai') !== -1){
+        if (type.indexOf('Kai') !== -1) {
             // retrofitted ship speed if existant.
-            if (type === 'Kai120'){
-                if ('SpeedKai120' in needChunk){
+            if (type === 'Kai120') {
+                if ('SpeedKai120' in needChunk) {
                     speed = needChunk['SpeedKai120'];
                 }
-                else if ('SpeedKai' in needChunk){
+                else if ('SpeedKai' in needChunk) {
                     speed = needChunk['SpeedKai'];
                 }
             }
-            else{
-                if ('SpeedKai' in needChunk){
+            else {
+                if ('SpeedKai' in needChunk) {
                     speed = needChunk['SpeedKai'];
                 }
             }
         }
         $('#ship_displayCase_speed').html('<small>Speed</small> ' + speed);
-        
+
         var gradeSuffix = 'Grade' + type;
         if ((type === 'Initial') || (type === 'Max') || (type === '120')) gradeSuffix = 'Grade';
         $('#ship_displayCase_armorType').text(needChunk['Armor']); // armor should be constant on all ships...
         var statItems = ['Torp', 'Fire', 'AA', 'Reload', 'Consumption', 'Air', 'Health', 'Evade', 'ASW'];
         statItems.forEach(function (item) {
             var gradeFilter = '(' + needChunk[item + gradeSuffix] + ')';
-            
+
             // key exceptions (key item prefix is different than the others)
             if (item === 'Torp') {
                 gradeFilter = '(' + needChunk[item + 'edo' + gradeSuffix] + ')';
@@ -557,7 +568,7 @@ http://czheng.me
             else if (item === 'Evade') {
                 gradeFilter = '(' + needChunk['Evasion' + gradeSuffix] + ')';
             }
-            
+
             // exception cases
             if (
                 (item === 'Reload') ||
@@ -566,9 +577,9 @@ http://czheng.me
             ) {
                 gradeFilter = '';
             }
-            
-            if (gradeFilter.length < 3){
-            	gradeFilter = '';
+
+            if (gradeFilter.length < 3) {
+                gradeFilter = '';
             }
 
             $('#ship_displayCase_' + item.toLowerCase()).text(needChunk[item + type] + ' ' + gradeFilter);
@@ -689,13 +700,13 @@ http://czheng.me
                 ship_db = ships;
 
                 // Attempt to cache data locally (reduces load times after initial loading)
-                localforage.setItem('az_ship', JSON.stringify(ship_db), function(error){
-                    if (error !== null){
+                localforage.setItem('az_ship', JSON.stringify(ship_db), function (error) {
+                    if (error !== null) {
                         alert("Error while attempting to cache ship data.");
                     }
                 });
-                localforage.setItem('az_resource', JSON.stringify(resource_db), function(error){
-                    if (error !== null){
+                localforage.setItem('az_resource', JSON.stringify(resource_db), function (error) {
+                    if (error !== null) {
                         alert("Error while attempting to cache resource data.");
                     }
                 });
@@ -710,7 +721,7 @@ http://czheng.me
     }
 
     // Starting method of application (w/o cache). Starts by fetching a list of ships.
-    function start(){
+    function start() {
         $.ajax({
             url: "https://azurlane.koumakan.jp/w/api.php",
             method: "GET",
@@ -731,25 +742,25 @@ http://czheng.me
     }
 
     // Starting point w. cache. Load cache and start application. Typically this is where the application is expected to start from...
-    localforage.getItem('az_ship', function(error, value){
+    localforage.getItem('az_ship', function (error, value) {
         if (error !== null) {
             alert("Error while attempting to load cached ship data.");
             start();
         }
-        else if (value === null){
+        else if (value === null) {
             // No data exists!
             start();
         }
-        else{
-            localforage.getItem('az_resource', function(error2, value2){
-                if (error2 !== null){
+        else {
+            localforage.getItem('az_resource', function (error2, value2) {
+                if (error2 !== null) {
                     alert("Error while attempting to load cached resource data.");
                     start();
                 }
-                else if (value2 === null){
+                else if (value2 === null) {
                     start();
                 }
-                else{
+                else {
                     ship_db = JSON.parse(value);
                     resource_db = JSON.parse(value2);
 
@@ -867,7 +878,7 @@ http://czheng.me
                         searchResult.append(newListElement);
                     }
                 }
-                else if ((omnisearch.toLowerCase() === 'allsearchablecomponents') || (omnisearch.toLowerCase() === 'asc')){
+                else if ((omnisearch.toLowerCase() === 'allsearchablecomponents') || (omnisearch.toLowerCase() === 'asc')) {
                     var allComps = $('<li></li>');
                     allComps.addClass('collection-item');
                     allComps.html('<b>Search format is [component]: search. All searchable components: </b>');
@@ -915,6 +926,11 @@ http://czheng.me
 
     $('#skinModal').modal();
     $('#miscInfoModal').modal();
+
+    $(document).ready(function () {
+        $('.collapsible').collapsible();
+    });
+
 </script>
 </body>
 </html>
