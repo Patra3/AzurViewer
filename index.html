@@ -61,6 +61,42 @@ http://czheng.me
         a {
             cursor: pointer;
         }
+
+        /*
+            Below is a solution to fit 5 columns in a grid in Materialize.
+            The solution can be found at:
+            https://stackoverflow.com/a/43084048
+         */
+        .s5ths,
+        .m5ths,
+        .l5ths,
+        .xl5ths {
+            margin-left: auto;
+            left: auto;
+            right: auto;
+        }
+
+        .row .col.s5ths {
+            width: 20%;
+        }
+
+        @media only screen and (min-width: 601px) {
+            .row .col.m5ths {
+                width: 20%;
+            }
+        }
+
+        @media only screen and (min-width: 993px) {
+            .row .col.l5ths {
+                width: 20%;
+            }
+        }
+
+        @media only screen and (min-width: 1201px) {
+            .row .col.xl5ths {
+                width: 20%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -211,7 +247,19 @@ http://czheng.me
             </li>
             <li>
                 <div class="collapsible-header"><i class="fas fa-cogs"></i> Construction</div>
-                <div class="collapsible-body"><i>Coming soon...</i> <!-- WIP --></div>
+                <div class="collapsible-body">
+                    <i>Work in progress, tread carefully...</i>
+                    <br>
+                    <br>
+                    <div class="row" style="text-align: center;">
+                        <div class="col m5ths s6" id="ship_displayCase_lightCraftable"></div>
+                        <div class="col m5ths s6" id="ship_displayCase_heavyCraftable"></div>
+                        <div class="col m5ths s6" id="ship_displayCase_aviationCraftable"></div>
+                        <div class="col m5ths s6" id="ship_displayCase_limitedCraftable"></div>
+                        <div class="col m5ths s6" id="ship_displayCase_exchangeCraftable"></div>
+                    </div>
+                    <ul class="collection" id="ship_displayCase_dropLocations"></ul>
+                </div>
             </li>
             <li>
                 <div class="collapsible-header"><i class="far fa-comment"></i> Voice Lines</div>
@@ -519,6 +567,71 @@ http://czheng.me
             row.append(slotNum, efficiencyVal, equipType);
             ep.append(row);
         });
+
+        // Ship construction
+        var constructTypes = ["Light", "Heavy", "Aviation", "Limited", "Exchange"];
+        constructTypes.forEach(function(item, index){
+            var test = false;
+            if (('D' + item in shipChunk['detailedItems'])){
+                if (shipChunk['detailedItems']['D' + item] === '1'){
+                    test = true;
+                }
+            }
+            var target = $('#ship_displayCase_' + item.toLowerCase() + 'Craftable');
+            var note = "";
+            var attr = "";
+            if (('D' + item + 'Note' in shipChunk['detailedItems'])){
+                note += shipChunk['detailedItems']['D' + item + 'Note'];
+            }
+            if (note.length > 0){
+                attr += 'class="tooltipped" data-position="top" data-tooltip="' + note + '"';
+            }
+
+            if (test){
+                target.empty();
+                target.append('<b ' + attr + '>' + item + '</b>' + '<br><i class="fas fa-check"></i>');
+            }
+            else{
+                target.empty();
+                target.append('<b ' + attr + '>' + item + '</b>' + '<br><i class="fas fa-times"></i>');
+            }
+        });
+
+        // drop map (WIP)
+        var locs = Object.keys(shipChunk['detailedItems']);
+        var rlocs = [];
+        locs.forEach(function(item){
+            if (item.charAt(0) === 'D') rlocs.push(item);
+        });
+        locs = [];
+        rlocs.forEach(function(item){
+            if (!isNaN(item.charAt(1))){
+                // D[somenumber] so should be a map entry.
+                locs.push(item);
+            }
+        });
+        var chapters = {};
+        locs.forEach(function(item){
+            var chopD = item.replace('D', '');
+            var split = chopD.split('-');
+            if (!(split[0] in chapters)){
+                chapters[split[0]] = [];
+            }
+            chapters[split[0]].push(split[1]);
+        });
+
+        var chapterArray = Object.keys(chapters);
+        var col = $('#ship_displayCase_dropLocations');
+        col.empty();
+        chapterArray.forEach(function(item, index){
+            var li = $('<li></li>');
+            li.addClass('collection-item');
+            li.html('Chapter ' + item + ': ' + JSON.stringify(chapters[item]));
+            col.append(li);
+        });
+
+        // Dynamically add tooltip call for Materialize.
+        $('.tooltipped').tooltip();
 
         changeStats('Max');
     }
