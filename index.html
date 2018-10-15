@@ -101,6 +101,7 @@ http://czheng.me
 </head>
 <body>
 
+<!-- omnisearch -->
 <nav id="omnisearch" style="display: none;">
     <div class="nav-wrapper blue darken-1">
         <form>
@@ -113,10 +114,12 @@ http://czheng.me
     </div>
 </nav>
 
+<!-- search results list -->
 <div class="container">
     <ul class="collection" id="search_results" style="display: none;"></ul>
 </div>
 
+<!-- loading element -->
 <div id="loading_pleaseWait" style="display: none;">
     <div class="container">
         <div class="card horizontal">
@@ -133,10 +136,18 @@ http://czheng.me
     </div>
 </div>
 
+<!-- main page element -->
+<div id="mainMenuDisplay" class="container" style="display: none;">
+    <br>
+</div>
+
+<!-- ship display element -->
 <div id="ship_displayCase" style="display: none;">
     <div class="container">
         <p id="ship_displayCase_rawData"></p> <!-- rawData div will only be filled for development purpose. -->
 
+        <br><button class="waves-effect waves-teal btn-flat" onclick="$('#ship_displayCase').hide();$('#mainMenuDisplay').show();"><i class="fas fa-angle-left"></i> Back</button>
+        
         <!-- ship name -->
         <h4 id="ship_displayCase_name" style="text-align: center;" onclick="checkClick();"></h4>
         <!-- ship skin display -->
@@ -248,9 +259,6 @@ http://czheng.me
             <li>
                 <div class="collapsible-header"><i class="fas fa-cogs"></i> Construction</div>
                 <div class="collapsible-body">
-                    <i>Work in progress, tread carefully...</i>
-                    <br>
-                    <br>
                     <div class="row" style="text-align: center;">
                         <div class="col m5ths s6" id="ship_displayCase_lightCraftable"></div>
                         <div class="col m5ths s6" id="ship_displayCase_heavyCraftable"></div>
@@ -269,6 +277,7 @@ http://czheng.me
     </div>
 </div>
 
+<!-- modals -->
 <div id="skinModal" class="modal">
     <div class="modal-content">
         <h4>Select a skin: </h4>
@@ -289,6 +298,7 @@ http://czheng.me
         </button>
     </div>
 </div>
+<!-- !modals -->
 
 <script>
 
@@ -355,6 +365,29 @@ http://czheng.me
             if (i < 0) break;
         }
         return i;
+    }
+    
+    function showMainMenu(){
+        
+        // create a row.
+        var row = $('<div class="row"></div>');
+        
+        var shipNames = Object.keys(ship_db);
+        shipNames.forEach(function(item){
+            var col = $('<div class="col s4"></div>');
+            col.html(
+                '<div class="card horizontal" style="cursor: pointer;" onclick="renderShipDisplayCase(\'' + item + '\');">' + 
+                '<div class="card-image"><img src="' + resource_db[item.replace(/ /g, "_") + 'Icon.png'] + '"></div>' + 
+                '<div class="card-stacked"><div class="card-content"><h6>' + item + '</h6></div></div></div>'
+                );
+            row.append(col);
+            if (row.children().length === 3){
+                $('#mainMenuDisplay').append(row);
+                row = $('<div class="row"></div>');
+            }
+        });
+        
+        $('#mainMenuDisplay').show();
     }
 
     /**
@@ -436,7 +469,7 @@ http://czheng.me
     function renderShipDisplayCase(shipName) {
 
         document.title = shipName;
-
+        
         // General display and name.
         $("#search").val("");
         var shipChunk = ship_db[shipName];
@@ -597,7 +630,6 @@ http://czheng.me
             }
         });
 
-        // drop map (WIP)
         var locs = Object.keys(shipChunk['detailedItems']);
         var rlocs = [];
         locs.forEach(function(item){
@@ -626,7 +658,23 @@ http://czheng.me
         chapterArray.forEach(function(item, index){
             var li = $('<li></li>');
             li.addClass('collection-item');
-            li.html('Chapter ' + item + ': ' + JSON.stringify(chapters[item]));
+            li.html('Chapter ' + item + ': ');
+            chapters[item].forEach(function(map, index){
+                // Go through each chapter and see if there is a note for the map. Add as tooltip.
+                var elementMeta = '';
+                if (('D' + item + '-' + map in shipChunk['detailedItems']) && (shipChunk['detailedItems']['D' + item + '-' + map] !== '1')){
+                    elementMeta += ' class="tooltipped" data-position="top" data-tooltip="' + shipChunk['detailedItems']['D' + item + '-' + map] + '">';
+                }
+                var span = $('<span' + elementMeta + '</span>');
+                map = map.replace('note', '');
+                if ((index + 1) === chapters[item].length){
+                    span.html(map);
+                }
+                else{
+                    span.html(map + ', ');
+                }
+                li.html(li.html() + span.prop('outerHTML'));
+            });
             col.append(li);
         });
 
@@ -634,6 +682,9 @@ http://czheng.me
         $('.tooltipped').tooltip();
 
         changeStats('Max');
+        
+        // Force user to go to the top of page.
+        window.scrollTo(0, 0);
     }
 
     /**
@@ -810,6 +861,7 @@ http://czheng.me
                 document.title = "AzurViewer";
                 $("#loading_pleaseWait").hide();
                 $("#omnisearch").show();
+                showMainMenu();
                 ship_db = ships;
 
                 // Attempt to cache data locally (reduces load times after initial loading)
@@ -881,6 +933,7 @@ http://czheng.me
                     document.title = "AzurViewer";
                     $("#loading_pleaseWait").hide();
                     $("#omnisearch").show();
+                    showMainMenu();
                 }
             });
         }
@@ -888,10 +941,19 @@ http://czheng.me
 
     // Makes the search results appear and disappear as search is focused.
     window.setInterval(function () {
+        
+        if (!$('#ship_displayCase').is(':visible')){
+            $('#mainMenuDisplay').show(); //don't call showMainMenu as it will infinitely concat more rows.
+        }
+        else{
+            $('#mainMenuDisplay').hide();
+        }
+            
         var search = $("#search");
         if (search.is(":focus") && (search.val().length > 0)) {
             $("#search_results").show();
             $("#ship_displayCase").hide();
+            $('#mainMenuDisplay').hide();
             document.title = "AzurViewer";
             devClicks = 0;
             $("#ship_displayCase_rawData").text("");
