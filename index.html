@@ -20,7 +20,7 @@ http://czheng.me
           integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 
     <!-- GOOGLE FONTS -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
 
     <!-- JQUERY -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -34,7 +34,7 @@ http://czheng.me
 
     <style>
         body {
-            font-family: "Open Sans", serif;
+            font-family: "Dosis", serif;
         }
 
         /*
@@ -97,17 +97,23 @@ http://czheng.me
                 width: 20%;
             }
         }
+        
+        #search::placeholder{
+            font-family: "Dosis", serif;
+            color: grey;
+        }
     </style>
 </head>
 <body>
 
 <!-- omnisearch -->
-<nav id="omnisearch" style="display: none;">
-    <div class="nav-wrapper blue darken-1">
+<br>
+<nav id="omnisearch" class="container z-depth-0" style="background-color: white; display: none;">
+    <div class="nav-wrapper white lighten-3" style="border-radius: 50px;">
         <form>
             <div class="input-field">
                 <input id="search" type="search" placeholder="Type 'help' for navigation options">
-                <label class="label-icon" for="search"><i class="fas fa-search"></i></label>
+                <label class="label-icon" for="search"><i class="fas fa-search" style="color: black;"></i></label>
                 <i class="material-icons fas fa-times" onclick="$('#search').val('');"></i>
             </div>
         </form>
@@ -369,25 +375,42 @@ http://czheng.me
     
     function showMainMenu(){
         
-        // create a row.
-        var row = $('<div class="row"></div>');
-        
-        var shipNames = Object.keys(ship_db);
-        shipNames.forEach(function(item){
-            var col = $('<div class="col s4"></div>');
-            col.html(
-                '<div class="card horizontal" style="cursor: pointer;" onclick="renderShipDisplayCase(\'' + item + '\');">' + 
-                '<div class="card-image"><img src="' + resource_db[item.replace(/ /g, "_") + 'Icon.png'] + '"></div>' + 
-                '<div class="card-stacked"><div class="card-content"><h6>' + item + '</h6></div></div></div>'
-                );
-            row.append(col);
-            if (row.children().length === 3){
-                $('#mainMenuDisplay').append(row);
-                row = $('<div class="row"></div>');
-            }
-        });
+        // If the client is a mobile browser, display list instead of rows as render is broken.
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+            var ul = $('<ul class="collection"></ul>');
+            var shipNames = Object.keys(ship_db);
+            shipNames.forEach(function(item){
+                var liAvatar = $('<li class="collection-item avatar" onclick="renderShipDisplayCase(\'' + item + '\');"></li>');
+                liAvatar.html(
+                    '<img src="' + resource_db[item.replace(/ /g, "_") + 'Icon.png'] + '" class="circle" alt="profile">' +
+                    '<span class="title">' + item + '</span>'
+                    );
+                ul.append(liAvatar);
+            });
+            $('#mainMenuDisplay').append(ul);
+        }
+        else{
+            // create a row.
+            var row = $('<div class="row"></div>');
+            
+            var shipNames = Object.keys(ship_db);
+            shipNames.forEach(function(item){
+                var col = $('<div class="col s4"></div>');
+                col.html(
+                    '<div class="card horizontal" style="cursor: pointer;" onclick="renderShipDisplayCase(\'' + item + '\');">' + 
+                    '<div class="card-image"><img src="' + resource_db[item.replace(/ /g, "_") + 'Icon.png'] + '"></div>' + 
+                    '<div class="card-stacked"><div class="card-content"><h6>' + item + '</h6></div></div></div>'
+                    );
+                row.append(col);
+                if (row.children().length === 3){
+                    $('#mainMenuDisplay').append(row);
+                    row = $('<div class="row"></div>');
+                }
+            });
+        }
         
         $('#mainMenuDisplay').show();
+        
     }
 
     /**
