@@ -809,8 +809,10 @@ http://czheng.me
         }
         localStorage.setItem('fullDataAmount', "0");
         localStorage.setItem('dataFetched', "0");
+        
         // Deep search for each ship, grab available stats.
-        for (var name in ships) {
+        var shipNames = Object.keys(ships);
+        shipNames.forEach(function(name){
             //var name = "Universal Bullin";
             var shipNameTag = ships[name]["pageLink"].substring(1);
             localStorage.setItem('fullDataAmount', (parseInt(localStorage.getItem('fullDataAmount')) + 1) + "");
@@ -831,8 +833,9 @@ http://czheng.me
 
                     // Reverse search ships by matching ID.
                     var currentShipID = raw[1].split("=")[1].trim();
+                    var currentShipAffiliation = raw[5].split("=")[1].trim();
                     for (var s in ships) {
-                        if (ships[s]["id"] === currentShipID) {
+                        if ((ships[s]["id"] === currentShipID) && (ships[s]["affiliation"] === currentShipAffiliation)){
                             ships[s]["detailedItems"] = {};
                             raw.forEach(function (item) {
                                 var twig = item.split("=");
@@ -870,7 +873,7 @@ http://czheng.me
                     });
                 }
             });
-        }
+        });
 
         // Essentially, waits until the ajaxes (above) are done, and then saves the data.
         var interval = window.setInterval(function () {
@@ -884,7 +887,6 @@ http://czheng.me
                 document.title = "AzurViewer";
                 $("#loading_pleaseWait").hide();
                 $("#omnisearch").show();
-                showMainMenu();
                 ship_db = ships;
 
                 // Attempt to cache data locally (reduces load times after initial loading)
@@ -899,6 +901,7 @@ http://czheng.me
                     }
                 });
 
+                showMainMenu();
                 clearInterval(interval);
             }
             else if ((document.readyState === "complete") && (localStorage.getItem('dataFetched') !== localStorage.getItem('fullDataAmount'))) {
@@ -1067,6 +1070,7 @@ http://czheng.me
                         "regular search": "Enter text and search results will appear based on ship name.",
                         "compare": "Compares named ships' stats. <a onclick='$(\"#search\").val(\"compare prinz eugen, belfast, universal bullin\");' style='cursor: pointer;'>Click for an example</a>",
                         "allsearchablecomponents (or asc)": "Gives a list of searchable keywords, with examples built in.",
+                        "update" : "Force updates the app information (if your ship data is out of date).",
                         "help": "Shows all possible commands."
                     };
                     for (var name in helpData) {
@@ -1086,6 +1090,12 @@ http://czheng.me
                         c.addClass('collection-item');
                         c.html('<i><a onclick="$(\'#search\').val(\'' + item + ': \');" style="cursor:pointer;">' + item + '</a></i>');
                         searchResult.append(c);
+                    });
+                }
+                else if ((omnisearch.toLowerCase() === 'update')) {
+                    localforage.clear().then(function(){
+                        alert("All cached data cleared, reloading...");
+                        location.reload();
                     });
                 }
                 else if (omnisearch.toLowerCase().indexOf('compare') !== -1) {
