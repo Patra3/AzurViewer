@@ -493,6 +493,8 @@ http://czheng.me
 
         document.title = shipName;
         
+        changeStats('Max');
+        
         // General display and name.
         $("#search").val("");
         var shipChunk = ship_db[shipName];
@@ -517,12 +519,13 @@ http://czheng.me
         var nationalityColorTypes = {
             "Sakura Empire": "pink",
             "Eagle Union": "dodgerblue",
-            "Royal Navy": "lightblue",
+            "Royal Navy": "#6EC8F5",
             "Ironblood": "lightcoral",
             "Eastern Radiance": "hotpink",
             "North Union": "lightgray",
             "Iris Libre": "gold",
-            "Vichya Dominion": "italianred"
+            "Vichya Dominion": "italianred",
+            "Bilibili" : "#495FFF"
         };
         var rarityColorTypes = {
             "Normal": "lightgray",
@@ -556,13 +559,15 @@ http://czheng.me
         // Ship misc info modal.
         $('#miscInfoModal_artist').html("<small>Artist</small> <a target='_blank' href='" + shipChunk['detailedItems']['ArtistLink'].replace('[', '').replace(']', '').replace(shipChunk['detailedItems']['Artist'], '') +
             "'>" + shipChunk['detailedItems']['Artist'] + "</a>");
-        var VAchunk = shipChunk['detailedItems']['VA']; // have to process this before putting into HTML.
-        VAchunk = VAchunk.replace('[', '').replace(']', '').replace('https://en.wikipedia.org/wiki/', '');
-        VAchunk = VAchunk.substring(0, VAchunk.indexOf(' '));
-        VAchunk = decodeURIComponent(VAchunk);
-        var VAlink = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(VAchunk);
-        $('#miscInfoModal_voiceActress').html("<small>Voice Actress</small> <a target='_blank' href='" + VAlink + "'>" + VAchunk.replace('_', ' ') + "</a>");
-
+        if (('VA' in shipChunk['detailedItems'])){
+            var VAchunk = shipChunk['detailedItems']['VA']; // have to process this before putting into HTML.
+            VAchunk = VAchunk.replace('[', '').replace(']', '').replace('https://en.wikipedia.org/wiki/', '');
+            VAchunk = VAchunk.substring(0, VAchunk.indexOf(' '));
+            VAchunk = decodeURIComponent(VAchunk);
+            var VAlink = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(VAchunk);
+            $('#miscInfoModal_voiceActress').html("<small>Voice Actress</small> <a target='_blank' href='" + VAlink + "'>" + VAchunk.replace('_', ' ') + "</a>");
+        }
+        
         // Ship reinforcement and scrap income 
         var fphtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png">';
         var torphtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png">';
@@ -571,21 +576,34 @@ http://czheng.me
         var coinhtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/c/c4/Coinicon.png/25px-Coinicon.png">';
         var oilhtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/f/f2/Oilicon.png/25px-Oilicon.png">';
         var medalhtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/3/33/Medalicon.png/20px-Medalicon.png">';
-        var scrapValues = shipChunk['detailedItems']['ScrapIncome']
+        var sr = shipChunk['detailedItems']['ScrapIncome'];
+        if (sr.replace('{{coin}}', '').replace('{{oil}}', '').replace('{{Medal}}', '').trim().length < 1){
+            $('#ship_displayCase_scrapIncome').html("<small>Reinforcement Value</small> Unavailable");
+        }
+        else{
+            var scrapValues = shipChunk['detailedItems']['ScrapIncome']
             .replace('{{coin}}', '')
             .replace('{{oil}}', '')
             .replace('{{Medal}}', '')
             .split(' ');
-        var reinforcementValues = shipChunk['detailedItems']['ReinforcementValue']
-            .replace('{{Firepower}}', '')
-            .replace('{{Torpedo}}', '')
-            .replace('{{Aviation}}', '')
-            .replace('{{RoF}}', '')
-            .split('  ');
-        // reinforce, scrapIncome
-        $('#ship_displayCase_reinforce').html('<small>Reinforcement Value</small> ' + reinforcementValues[0] + ' ' + fphtml + ', ' + reinforcementValues[1] + ' ' + torphtml + ', ' + reinforcementValues[2] + ' ' + aviahtml + ', ' + reinforcementValues[3] + ' ' + reloadhtml);
-        $('#ship_displayCase_scrapIncome').html('<small>Scrap Income</small> ' + scrapValues[0] + ' ' + coinhtml + ', ' + scrapValues[1] + ' ' + oilhtml + ', ' + scrapValues[2] + ' ' + medalhtml);
-
+            $('#ship_displayCase_scrapIncome').html('<small>Scrap Income</small> ' + scrapValues[0] + ' ' + coinhtml + ', ' + scrapValues[1] + ' ' + oilhtml + ', ' + scrapValues[2] + ' ' + medalhtml);
+        }
+        var rr = shipChunk['detailedItems']['ReinforcementValue'];
+        if (rr.replace('{{Firepower}}', '').replace('{{Torpedo}}', '').replace('{{Aviation}}', '').replace('{{RoF}}', '').trim().length < 2){
+            $('#ship_displayCase_reinforce').html("<small>Reinforcement Value</small> Unavailable");
+        }
+        else{
+            var reinforcementValues = [];
+            reinforcementValues[0] = rr.substring(0, rr.indexOf('{{Firepower}}')).trim();
+            rr = rr.substring(rr.indexOf('{{Firepower}}') + 13);
+            reinforcementValues[1] = rr.substring(0, rr.indexOf('{{Torpedo}}')).trim();
+            rr = rr.substring(rr.indexOf('{{Torpedo}}') + 11);
+            reinforcementValues[2] = rr.substring(0, rr.indexOf('{{Aviation}}')).trim();
+            rr = rr.substring(rr.indexOf('{{Aviation}}') + 12);
+            reinforcementValues[3] = rr.substring(0, rr.indexOf('{{RoF}}')).trim();
+            $('#ship_displayCase_reinforce').html('<small>Reinforcement Value</small> ' + reinforcementValues[0] + ' ' + fphtml + ', ' + reinforcementValues[1] + ' ' + torphtml + ', ' + reinforcementValues[2] + ' ' + aviahtml + ', ' + reinforcementValues[3] + ' ' + reloadhtml);
+        }
+        
         // Ship equipment.
         var ep = $('#ship_displayCase_equipmentPanel');
         ep.empty();
@@ -704,7 +722,7 @@ http://czheng.me
         // Dynamically add tooltip call for Materialize.
         $('.tooltipped').tooltip();
 
-        changeStats('Max');
+        //changeStats('Max');
         
         // Force user to go to the top of page.
         window.scrollTo(0, 0);
@@ -715,7 +733,6 @@ http://czheng.me
      * type is a proper identifier such as 'Initial' or 'Kai120'.
      */
     function changeStats(type) {
-
         var needChunk = ship_db[document.title]['detailedItems'];
 
         // Display the speed value dependent only on kai or normal.
