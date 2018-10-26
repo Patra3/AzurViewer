@@ -576,34 +576,44 @@ http://czheng.me
         var coinhtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/c/c4/Coinicon.png/25px-Coinicon.png">';
         var oilhtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/f/f2/Oilicon.png/25px-Oilicon.png">';
         var medalhtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/3/33/Medalicon.png/20px-Medalicon.png">';
-        var sr = shipChunk['detailedItems']['ScrapIncome'];
-        if (sr.replace('{{coin}}', '').replace('{{oil}}', '').replace('{{Medal}}', '').trim().length < 1){
-            $('#ship_displayCase_scrapIncome').html("<small>Reinforcement Value</small> Unavailable");
+        if (('ScrapIncome' in shipChunk['detailedItems'])) {
+            var sr = shipChunk['detailedItems']['ScrapIncome'];
+            if (sr.replace('{{coin}}', '').replace('{{oil}}', '').replace('{{Medal}}', '').trim().length < 1) {
+                $('#ship_displayCase_scrapIncome').html("<small>Scrap Income</small> Unavailable");
+            }
+            else {
+                var scrapValues = shipChunk['detailedItems']['ScrapIncome']
+                    .replace('{{coin}}', '')
+                    .replace('{{oil}}', '')
+                    .replace('{{Medal}}', '')
+                    .split(' ');
+                $('#ship_displayCase_scrapIncome').html('<small>Scrap Income</small> ' + scrapValues[0] + ' ' + coinhtml + ', ' + scrapValues[1] + ' ' + oilhtml + ', ' + scrapValues[2] + ' ' + medalhtml);
+            }
         }
         else{
-            var scrapValues = shipChunk['detailedItems']['ScrapIncome']
-            .replace('{{coin}}', '')
-            .replace('{{oil}}', '')
-            .replace('{{Medal}}', '')
-            .split(' ');
-            $('#ship_displayCase_scrapIncome').html('<small>Scrap Income</small> ' + scrapValues[0] + ' ' + coinhtml + ', ' + scrapValues[1] + ' ' + oilhtml + ', ' + scrapValues[2] + ' ' + medalhtml);
+            $('#ship_displayCase_scrapIncome').html("<small>Scrap Income</small> Unavailable");
         }
-        var rr = shipChunk['detailedItems']['ReinforcementValue'];
-        if (rr.replace('{{Firepower}}', '').replace('{{Torpedo}}', '').replace('{{Aviation}}', '').replace('{{RoF}}', '').trim().length < 2){
+        if (('ReinforcementValue' in shipChunk['detailedItems'])) {
+            var rr = shipChunk['detailedItems']['ReinforcementValue'];
+            if (rr.replace('{{Firepower}}', '').replace('{{Torpedo}}', '').replace('{{Aviation}}', '').replace('{{RoF}}', '').trim().length < 2) {
+                $('#ship_displayCase_reinforce').html("<small>Reinforcement Value</small> Unavailable");
+            }
+            else {
+                var reinforcementValues = [];
+                reinforcementValues[0] = rr.substring(0, rr.indexOf('{{Firepower}}')).trim();
+                rr = rr.substring(rr.indexOf('{{Firepower}}') + 13);
+                reinforcementValues[1] = rr.substring(0, rr.indexOf('{{Torpedo}}')).trim();
+                rr = rr.substring(rr.indexOf('{{Torpedo}}') + 11);
+                reinforcementValues[2] = rr.substring(0, rr.indexOf('{{Aviation}}')).trim();
+                rr = rr.substring(rr.indexOf('{{Aviation}}') + 12);
+                reinforcementValues[3] = rr.substring(0, rr.indexOf('{{RoF}}')).trim();
+                $('#ship_displayCase_reinforce').html('<small>Reinforcement Value</small> ' + reinforcementValues[0] + ' ' + fphtml + ', ' + reinforcementValues[1] + ' ' + torphtml + ', ' + reinforcementValues[2] + ' ' + aviahtml + ', ' + reinforcementValues[3] + ' ' + reloadhtml);
+            }
+        }
+        else{
             $('#ship_displayCase_reinforce').html("<small>Reinforcement Value</small> Unavailable");
         }
-        else{
-            var reinforcementValues = [];
-            reinforcementValues[0] = rr.substring(0, rr.indexOf('{{Firepower}}')).trim();
-            rr = rr.substring(rr.indexOf('{{Firepower}}') + 13);
-            reinforcementValues[1] = rr.substring(0, rr.indexOf('{{Torpedo}}')).trim();
-            rr = rr.substring(rr.indexOf('{{Torpedo}}') + 11);
-            reinforcementValues[2] = rr.substring(0, rr.indexOf('{{Aviation}}')).trim();
-            rr = rr.substring(rr.indexOf('{{Aviation}}') + 12);
-            reinforcementValues[3] = rr.substring(0, rr.indexOf('{{RoF}}')).trim();
-            $('#ship_displayCase_reinforce').html('<small>Reinforcement Value</small> ' + reinforcementValues[0] + ' ' + fphtml + ', ' + reinforcementValues[1] + ' ' + torphtml + ', ' + reinforcementValues[2] + ' ' + aviahtml + ', ' + reinforcementValues[3] + ' ' + reloadhtml);
-        }
-        
+
         // Ship equipment.
         var ep = $('#ship_displayCase_equipmentPanel');
         ep.empty();
@@ -721,8 +731,6 @@ http://czheng.me
 
         // Dynamically add tooltip call for Materialize.
         $('.tooltipped').tooltip();
-
-        //changeStats('Max');
         
         // Force user to go to the top of page.
         window.scrollTo(0, 0);
@@ -807,7 +815,7 @@ http://czheng.me
                     data[i + 1].includes("a href=\"") &&
                     (isNaN(data[i + 1].substring(data[i + 1].indexOf(">") + 1)) || (parseInt(data[i + 1].substring(data[i + 1].indexOf(">") + 1)) < 3000))
                 ) {
-                    var shipName = (data[i + 1].substring(9, nthIndex(data[i + 1], "\"", 2))).replace(/_/g, " ");
+                    var shipName = (data[i + 1].substring(9, nthIndex(data[i + 1], "\"", 2))).replace(/_/g, " ").replace('%C3%B6', 'ö');
                     ships[shipName] = {
                         pageLink: "/" + shipName.replace(/ /g, "_"), // Ship Wikimedia page
                         id: data[i + 1].substring(data[i + 1].indexOf(">") + 1), // Ship ID
@@ -831,7 +839,7 @@ http://czheng.me
         var shipNames = Object.keys(ships);
         shipNames.forEach(function(name){
             //var name = "Universal Bullin";
-            var shipNameTag = ships[name]["pageLink"].substring(1);
+            var shipNameTag = ships[name]["pageLink"].substring(1).replace('%C3%B6', 'ö');
             localStorage.setItem('fullDataAmount', (parseInt(localStorage.getItem('fullDataAmount')) + 1) + "");
             $.ajax({
                 url: "https://azurlane.koumakan.jp/w/api.php",
@@ -845,12 +853,19 @@ http://czheng.me
                 },
                 success: function (data) {
                     localStorage.setItem('dataFetched', (parseInt(localStorage.getItem('dataFetched')) + 1) + "");
+
                     var raw = data["parse"]["wikitext"]["*"];
                     raw = raw.split("|");
 
                     // Reverse search ships by matching ID.
                     var currentShipID = raw[1].split("=")[1].trim();
                     var currentShipAffiliation = raw[5].split("=")[1].trim();
+                    // This is a quick workaround for the app in order to fix loading issue with the new characters.
+                    // Essentially hard-coded solution to new wiki data format (order of data is swapped).
+                    if (["Normal", "Rare", "Elite", "Super Rare", "Ultra Rare"].indexOf(currentShipAffiliation) !== -1){
+                        currentShipAffiliation = raw[6].split("=")[1].trim();
+                    }
+
                     for (var s in ships) {
                         if ((ships[s]["id"] === currentShipID) && (ships[s]["affiliation"] === currentShipAffiliation)){
                             ships[s]["detailedItems"] = {};
@@ -1111,7 +1126,7 @@ http://czheng.me
                 }
                 else if ((omnisearch.toLowerCase() === 'update')) {
                     localforage.clear().then(function(){
-                        alert("All cached data cleared, reloading...");
+                        alert("Updating the app, please wait~");
                         location.reload();
                     });
                 }
