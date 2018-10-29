@@ -254,9 +254,7 @@ http://czheng.me
             </div>
         </div>
 
-        <!-- ship equipment slots -->
-
-        <!-- collection and voice lines collapsible -->
+        <!-- equipment, collection and voice lines collapsible -->
         <ul class="collapsible">
             <li>
                 <div class="collapsible-header"><i class="fas fa-wrench"></i> Equipment</div>
@@ -280,6 +278,13 @@ http://czheng.me
                 <div class="collapsible-body"><i>Coming soon...</i> <!-- WIP --></div>
             </li>
         </ul>
+        
+        <!-- retrofit component -->
+        <div id="ship_displayCase_retrofit" style="display: none;">
+            <button class="waves-effect waves-light btn-large white" onclick="window.open('https://azurlane.koumakan.jp/' + document.title.replace(/ /g, '_') + '#Retrofit', '_blank');" style="color: black; width: 100%;">Click for Retrofit data</button>
+            <br><br>
+        </div>
+        
     </div>
 </div>
 
@@ -308,7 +313,7 @@ http://czheng.me
 
 <script>
 
-    // Development raw data name clicker.
+    // Click on name about 20 times and you will get the entire data blob (dev only).
     var devClicks = 0;
 
     function checkClick() {
@@ -728,6 +733,14 @@ http://czheng.me
             });
             col.append(li);
         });
+        
+        // Ship retrofit (button hide).
+        if (shipChunk['detailedItems']['Remodel'] === '1'){
+            $("#ship_displayCase_retrofit").show();
+        }
+        else{
+            $("#ship_displayCase_retrofit").hide();
+        }
 
         // Dynamically add tooltip call for Materialize.
         $('.tooltipped').tooltip();
@@ -1163,10 +1176,25 @@ http://czheng.me
             event.preventDefault();
         }
     });
+    
+    // Back button will always bring you to home (back button capture).
+    jQuery(document).ready(function($){
+        if (window.history && window.history.pushState){
+            window.history.pushState('forward', null, './#d');
+            $(window).on('popstate', function(){
+                document.title = 'AzurViewer';
+                $('#ship_displayCase').hide();
+                $('#mainMenuDisplay').show();
+                window.history.pushState('forward', null, './#d');
+            });
+        }
+    });
 
+    // Register modals.
     $('#skinModal').modal();
     $('#miscInfoModal').modal();
 
+    // Register collapsibles.
     $(document).ready(function () {
         $('.collapsible').collapsible();
     });
