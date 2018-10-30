@@ -1,14 +1,15 @@
 {
   "short_name" : "AzurViewer",
   "name" : "AzurViewer",
+  "description" : " A web explorer for Azur Lane. Look at detailed ship stats, descriptions and more.",
   "icons" : [
     {
       "src" : "icon.png",
       "type" : "image/png",
-      "sizes" : "116x116"
+      "sizes" : "128x128"
     }
   ],
-  "background_color" : "#007FFF",
+  "background_color" : "#72a6db",
   "display" : "standalone",
-  "theme_color" : "#007FFF"
+  "theme_color" : "#72a6db"
 }
