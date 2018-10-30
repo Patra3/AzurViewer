@@ -14,7 +14,8 @@ http://czheng.me
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="manifest.json">
-
+    <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+    
     <!-- FONT AWESOME -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
           integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
@@ -31,7 +32,7 @@ http://czheng.me
 
     <!-- LOCALFORAGE -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.7.2/localforage.min.js"></script>
-
+    
     <style>
         body {
             font-family: "Dosis", serif;
@@ -160,7 +161,7 @@ http://czheng.me
         <div class="imgbox"><img onclick="displaySkinModal();" class="center-fit" id="ship_displayCase_skinpicture"
                                  src="https://azurlane.koumakan.jp/w/images/0/06/Akagi.png"></div>
         <!-- ship basic info -->
-        <ul class="collection">
+        <ul class="collection z-depth-1">
             <li id="ship_displayCase_nationality" class="collection-item"></li>
             <li id="ship_displayCase_rarity" class="collection-item"></li>
             <li id="ship_displayCase_constructionTime" class="collection-item"></li>
@@ -176,15 +177,15 @@ http://czheng.me
         <!-- ship stats -->
         <div class="card">
             <div class="card-tabs">
-                <ul class="tabs tabs-fixed-width">
+                <ul class="tabs tabs-fixed-width" id="ship_displayCase_tabs">
                     <li class="tab"><a onclick="changeStats('Kai');">Lv. 100 Retrofit</a></li>
-                    <li class="tab"><a onclick="changeStats('Max');">Lv. 100</a></li>
+                    <li class="tab"><a id='100tabs' onclick="changeStats('Max');" class="active">Lv. 100</a></li>
                     <li class="tab"><a onclick="changeStats('Kai120');">Lv. 120 Retrofit</a></li>
                     <li class="tab"><a onclick="changeStats('120');">Lv. 120</a></li>
                     <li class="tab"><a onclick="changeStats('Initial');">Base</a></li>
                 </ul>
             </div>
-            <div class="card-content grey lighten-5">
+            <div class="card-content">
                 <ul class="collection">
                     <li class="collection-item avatar">
                         <img src="https://azurlane.koumakan.jp/w/images/thumb/8/8b/Duration.png/25px-Duration.png"
@@ -253,7 +254,26 @@ http://czheng.me
                 </ul>
             </div>
         </div>
-
+        
+        <!--
+        <div class="row">
+            <div class="col s6">
+                <div class="card">
+                    <div class="card-content">
+                        <h6>Limit Break Ranks</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col s6">
+                <div class="card">
+                    <div class="card-content">
+                        <h6>Abilities</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        -->
+        
         <!-- equipment, collection and voice lines collapsible -->
         <ul class="collapsible">
             <li>
@@ -747,6 +767,11 @@ http://czheng.me
         
         // Force user to go to the top of page.
         window.scrollTo(0, 0);
+        
+        // Tabs fix (the tab selector is broken)
+        var tabParent = $('#ship_displayCase_tabs');
+        tabParent.tabs('select', '100tabs');
+        tabParent.tabs('updateTabIndicator');
     }
 
     /**
@@ -1189,14 +1214,13 @@ http://czheng.me
             });
         }
     });
-
-    // Register modals.
-    $('#skinModal').modal();
-    $('#miscInfoModal').modal();
-
-    // Register collapsibles.
+    
+    // Register all items.
     $(document).ready(function () {
         $('.collapsible').collapsible();
+        $('.tabs').tabs();
+        $('#skinModal').modal();
+        $('#miscInfoModal').modal();
     });
 
 </script>
