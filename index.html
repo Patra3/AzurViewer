@@ -14,7 +14,7 @@ http://czheng.me
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
     
     <!-- FONT AWESOME -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
@@ -520,27 +520,8 @@ http://czheng.me
         
         changeStats('Max');
         
-        // General display and name.
-        $("#search").val("");
         var shipChunk = ship_db[shipName];
-        $("#ship_displayCase").show();
-        $("#ship_displayCase_name").html(shipName + " <small><small><small>(CN: " + shipChunk["detailedItems"]["CNName"] + "; JP: " + shipChunk["detailedItems"]["JPName"] + ")</small></small></small>");
-
-        // Skin image
-        var sp = $("#ship_displayCase_skinpicture");
-        sp.hide();
-        sp.ready(function () {
-            $("#ship_displayCase_skinpicture").show();
-        });
-        sp.attr("src", resource_db[shipName.replace(/ /g, "_") + ".png"]);
-
-        // Ship general attributes and misc info.
         var nationality = shipChunk["detailedItems"]["Nationality"];//detailedItems is more accurate to read from
-        var rarity = shipChunk["detailedItems"]["Rarity"];
-        var constructionTime = shipChunk["detailedItems"]["ConstructTime"];
-        var clas = shipChunk["detailedItems"]["Class"];
-        var hullType = shipChunk["detailedItems"]["Type"];
-        var id = shipChunk["detailedItems"]["ID"];
         var nationalityColorTypes = {
             "Sakura Empire": "pink",
             "Eagle Union": "dodgerblue",
@@ -552,6 +533,37 @@ http://czheng.me
             "Vichya Dominion": "italianred",
             "Bilibili" : "#495FFF"
         };
+        var nationalityAbbrev = {
+            "Sakura Empire" : "IJN",
+            "Eagle Union" : "USS",
+            "Royal Navy" : "HMS",
+            "Ironblood" : "KMS",
+            "Eastern Radiance" : "ROC",
+            "North Union" : "SN",
+            "Iris Libre" : "FFNF",
+            "Vichya Dominion" : "MNF",
+            "BiliBili" : ""
+        };
+        
+        // General display and name.
+        $("#search").val("");
+        $("#ship_displayCase").show();
+        $("#ship_displayCase_name").html("<small style='color: " + nationalityColorTypes[nationality] + "; font-weight: bold;'>[" + nationalityAbbrev[nationality] + "]</small> " + shipName + " <small><small><small>(CN: " + shipChunk["detailedItems"]["CNName"] + "; JP: " + shipChunk["detailedItems"]["JPName"] + ")</small></small></small>");
+        
+        // Skin image
+        var sp = $("#ship_displayCase_skinpicture");
+        sp.hide();
+        sp.ready(function () {
+            $("#ship_displayCase_skinpicture").show();
+        });
+        sp.attr("src", resource_db[shipName.replace(/ /g, "_") + ".png"]);
+
+        // Ship general attributes and misc info.
+        var rarity = shipChunk["detailedItems"]["Rarity"];
+        var constructionTime = shipChunk["detailedItems"]["ConstructTime"];
+        var clas = shipChunk["detailedItems"]["Class"];
+        var hullType = shipChunk["detailedItems"]["Type"];
+        var id = shipChunk["detailedItems"]["ID"];
         var rarityColorTypes = {
             "Normal": "lightgray",
             "Rare": "lightblue",
