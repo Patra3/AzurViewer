@@ -4,9 +4,14 @@
   "description" : " A web explorer for Azur Lane. Look at detailed ship stats, descriptions and more.",
   "icons" : [
     {
-      "src" : "icon.png",
+      "src" : "images/icon-192.png",
       "type" : "image/png",
-      "sizes" : "128x128"
+      "sizes" : "192x192"
+    },
+    {
+      "src" : "images/icon-512.png",
+      "type" : "image/png",
+      "sizes" : "512x512"
     }
   ],
   "start_url" : "/#home",
