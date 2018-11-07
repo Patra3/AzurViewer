@@ -13,9 +13,11 @@ http://czheng.me
     <title>AzurViewer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#72a6db">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon"/>
-    
+
     <!-- FONT AWESOME -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
           integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
@@ -32,7 +34,7 @@ http://czheng.me
 
     <!-- LOCALFORAGE -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.7.2/localforage.min.js"></script>
-    
+
     <style>
         body {
             font-family: "Dosis", serif;
@@ -98,8 +100,8 @@ http://czheng.me
                 width: 20%;
             }
         }
-        
-        #search::placeholder{
+
+        #search::placeholder {
             font-family: "Dosis", serif;
             color: grey;
         }
@@ -153,8 +155,12 @@ http://czheng.me
     <div class="container">
         <p id="ship_displayCase_rawData"></p> <!-- rawData div will only be filled for development purpose. -->
 
-        <br><button class="waves-effect waves-teal btn-flat" onclick="document.title='AzurViewer';$('#ship_displayCase').hide();$('#mainMenuDisplay').show();"><i class="fas fa-angle-left"></i> Back</button>
-        
+        <br>
+        <button class="waves-effect waves-teal btn-flat"
+                onclick="document.title='AzurViewer';$('#ship_displayCase').hide();$('#mainMenuDisplay').show();"><i
+                class="fas fa-angle-left"></i> Back
+        </button>
+
         <!-- ship name -->
         <h4 id="ship_displayCase_name" style="text-align: center;" onclick="checkClick();"></h4>
         <!-- ship skin display -->
@@ -254,7 +260,7 @@ http://czheng.me
                 </ul>
             </div>
         </div>
-        
+
         <!--
         <div class="row">
             <div class="col s6">
@@ -273,7 +279,7 @@ http://czheng.me
             </div>
         </div>
         -->
-        
+
         <!-- equipment, collection and voice lines collapsible -->
         <ul class="collapsible">
             <li>
@@ -298,13 +304,16 @@ http://czheng.me
                 <div class="collapsible-body"><i>Coming soon...</i> <!-- WIP --></div>
             </li>
         </ul>
-        
+
         <!-- retrofit component -->
         <div id="ship_displayCase_retrofit" style="display: none;">
-            <button class="waves-effect waves-light btn-large white" onclick="window.open('https://azurlane.koumakan.jp/' + document.title.replace(/ /g, '_') + '#Retrofit', '_blank');" style="color: black; width: 100%;">Click for Retrofit data</button>
+            <button class="waves-effect waves-light btn-large white"
+                    onclick="window.open('https://azurlane.koumakan.jp/' + document.title.replace(/ /g, '_') + '#Retrofit', '_blank');"
+                    style="color: black; width: 100%;">Click for Retrofit data
+            </button>
             <br><br>
         </div>
-        
+
     </div>
 </div>
 
@@ -397,45 +406,45 @@ http://czheng.me
         }
         return i;
     }
-    
-    function showMainMenu(){
-        
+
+    function showMainMenu() {
+
         // If the client is a mobile browser, display list instead of rows as render is broken.
         if (/Mobi|Android/i.test(navigator.userAgent)) {
             var ul = $('<ul class="collection"></ul>');
             var shipNames = Object.keys(ship_db);
-            shipNames.forEach(function(item){
+            shipNames.forEach(function (item) {
                 var liAvatar = $('<li class="collection-item avatar" onclick="renderShipDisplayCase(\'' + item + '\');"></li>');
                 liAvatar.html(
                     '<img src="' + resource_db[item.replace(/ /g, "_") + 'Icon.png'] + '" class="circle" alt="profile">' +
                     '<span class="title">' + item + '</span>'
-                    );
+                );
                 ul.append(liAvatar);
             });
             $('#mainMenuDisplay').append(ul);
         }
-        else{
+        else {
             // create a row.
             var row = $('<div class="row"></div>');
-            
+
             var shipNames = Object.keys(ship_db);
-            shipNames.forEach(function(item){
+            shipNames.forEach(function (item) {
                 var col = $('<div class="col s4"></div>');
                 col.html(
-                    '<div class="card horizontal" style="cursor: pointer;" onclick="renderShipDisplayCase(\'' + item + '\');">' + 
-                    '<div class="card-image"><img src="' + resource_db[item.replace(/ /g, "_") + 'Icon.png'] + '"></div>' + 
+                    '<div class="card horizontal" style="cursor: pointer;" onclick="renderShipDisplayCase(\'' + item + '\');">' +
+                    '<div class="card-image"><img src="' + resource_db[item.replace(/ /g, "_") + 'Icon.png'] + '"></div>' +
                     '<div class="card-stacked"><div class="card-content"><h6>' + item + '</h6></div></div></div>'
-                    );
+                );
                 row.append(col);
-                if (row.children().length === 3){
+                if (row.children().length === 3) {
                     $('#mainMenuDisplay').append(row);
                     row = $('<div class="row"></div>');
                 }
             });
         }
-        
+
         $('#mainMenuDisplay').show();
-        
+
     }
 
     /**
@@ -517,9 +526,9 @@ http://czheng.me
     function renderShipDisplayCase(shipName) {
 
         document.title = shipName;
-        
+
         changeStats('Max');
-        
+
         var shipChunk = ship_db[shipName];
         var nationality = shipChunk["detailedItems"]["Nationality"];//detailedItems is more accurate to read from
         var nationalityColorTypes = {
@@ -531,27 +540,27 @@ http://czheng.me
             "North Union": "lightgray",
             "Iris Libre": "gold",
             "Vichya Dominion": "italianred",
-            "Bilibili" : "#495FFF",
-            "Universal" : "#845bc1"
+            "Bilibili": "#495FFF",
+            "Universal": "#845bc1"
         };
         var nationalityAbbrev = {
-            "Sakura Empire" : "IJN",
-            "Eagle Union" : "USS",
-            "Royal Navy" : "HMS",
-            "Ironblood" : "KMS",
-            "Eastern Radiance" : "ROC",
-            "North Union" : "SN",
-            "Iris Libre" : "FFNF",
-            "Vichya Dominion" : "MNF",
-            "Bilibili" : "",
-            "Universal" : "UNIV"
+            "Sakura Empire": "IJN",
+            "Eagle Union": "USS",
+            "Royal Navy": "HMS",
+            "Ironblood": "KMS",
+            "Eastern Radiance": "ROC",
+            "North Union": "SN",
+            "Iris Libre": "FFNF",
+            "Vichya Dominion": "MNF",
+            "Bilibili": "",
+            "Universal": "UNIV"
         };
-        
+
         // General display and name.
         $("#search").val("");
         $("#ship_displayCase").show();
         $("#ship_displayCase_name").html("<small style='color: " + nationalityColorTypes[nationality] + "; font-weight: bold;'>[" + nationalityAbbrev[nationality] + "]</small> " + shipName + " <small><small><small>(CN: " + shipChunk["detailedItems"]["CNName"] + "; JP: " + shipChunk["detailedItems"]["JPName"] + ")</small></small></small>");
-        
+
         // Skin image
         var sp = $("#ship_displayCase_skinpicture");
         sp.hide();
@@ -598,7 +607,7 @@ http://czheng.me
         // Ship misc info modal.
         $('#miscInfoModal_artist').html("<small>Artist</small> <a target='_blank' href='" + shipChunk['detailedItems']['ArtistLink'].replace('[', '').replace(']', '').replace(shipChunk['detailedItems']['Artist'], '') +
             "'>" + shipChunk['detailedItems']['Artist'] + "</a>");
-        if (('VA' in shipChunk['detailedItems'])){
+        if (('VA' in shipChunk['detailedItems'])) {
             var VAchunk = shipChunk['detailedItems']['VA']; // have to process this before putting into HTML.
             VAchunk = VAchunk.replace('[', '').replace(']', '').replace('https://en.wikipedia.org/wiki/', '');
             VAchunk = VAchunk.substring(0, VAchunk.indexOf(' '));
@@ -606,8 +615,8 @@ http://czheng.me
             var VAlink = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(VAchunk);
             $('#miscInfoModal_voiceActress').html("<small>Voice Actress</small> <a target='_blank' href='" + VAlink + "'>" + VAchunk.replace('_', ' ') + "</a>");
         }
-        
-        // Ship reinforcement and scrap income 
+
+        // Ship reinforcement and scrap income
         var fphtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/d/d5/Firepower.png/25px-Firepower.png">';
         var torphtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/4/40/Torpedo.png/25px-Torpedo.png">';
         var aviahtml = '<img src="https://azurlane.koumakan.jp/w/images/thumb/6/6a/Aviation.png/25px-Aviation.png">';
@@ -629,7 +638,7 @@ http://czheng.me
                 $('#ship_displayCase_scrapIncome').html('<small>Scrap Income</small> ' + scrapValues[0] + ' ' + coinhtml + ', ' + scrapValues[1] + ' ' + oilhtml + ', ' + scrapValues[2] + ' ' + medalhtml);
             }
         }
-        else{
+        else {
             $('#ship_displayCase_scrapIncome').html("<small>Scrap Income</small> Unavailable");
         }
         if (('ReinforcementValue' in shipChunk['detailedItems'])) {
@@ -649,7 +658,7 @@ http://czheng.me
                 $('#ship_displayCase_reinforce').html('<small>Reinforcement Value</small> ' + reinforcementValues[0] + ' ' + fphtml + ', ' + reinforcementValues[1] + ' ' + torphtml + ', ' + reinforcementValues[2] + ' ' + aviahtml + ', ' + reinforcementValues[3] + ' ' + reloadhtml);
             }
         }
-        else{
+        else {
             $('#ship_displayCase_reinforce').html("<small>Reinforcement Value</small> Unavailable");
         }
 
@@ -693,28 +702,28 @@ http://czheng.me
 
         // Ship construction
         var constructTypes = ["Light", "Heavy", "Aviation", "Limited", "Exchange"];
-        constructTypes.forEach(function(item, index){
+        constructTypes.forEach(function (item, index) {
             var test = false;
-            if (('D' + item in shipChunk['detailedItems'])){
-                if (shipChunk['detailedItems']['D' + item] === '1'){
+            if (('D' + item in shipChunk['detailedItems'])) {
+                if (shipChunk['detailedItems']['D' + item] === '1') {
                     test = true;
                 }
             }
             var target = $('#ship_displayCase_' + item.toLowerCase() + 'Craftable');
             var note = "";
             var attr = "";
-            if (('D' + item + 'Note' in shipChunk['detailedItems'])){
+            if (('D' + item + 'Note' in shipChunk['detailedItems'])) {
                 note += shipChunk['detailedItems']['D' + item + 'Note'];
             }
-            if (note.length > 0){
+            if (note.length > 0) {
                 attr += 'class="tooltipped" data-position="top" data-tooltip="' + note + '"';
             }
 
-            if (test){
+            if (test) {
                 target.empty();
                 target.append('<b ' + attr + '>' + item + '</b>' + '<br><i class="fas fa-check"></i>');
             }
-            else{
+            else {
                 target.empty();
                 target.append('<b ' + attr + '>' + item + '</b>' + '<br><i class="fas fa-times"></i>');
             }
@@ -722,21 +731,21 @@ http://czheng.me
 
         var locs = Object.keys(shipChunk['detailedItems']);
         var rlocs = [];
-        locs.forEach(function(item){
+        locs.forEach(function (item) {
             if (item.charAt(0) === 'D') rlocs.push(item);
         });
         locs = [];
-        rlocs.forEach(function(item){
-            if (!isNaN(item.charAt(1))){
+        rlocs.forEach(function (item) {
+            if (!isNaN(item.charAt(1))) {
                 // D[somenumber] so should be a map entry.
                 locs.push(item);
             }
         });
         var chapters = {};
-        locs.forEach(function(item){
+        locs.forEach(function (item) {
             var chopD = item.replace('D', '');
             var split = chopD.split('-');
-            if (!(split[0] in chapters)){
+            if (!(split[0] in chapters)) {
                 chapters[split[0]] = [];
             }
             chapters[split[0]].push(split[1]);
@@ -745,43 +754,43 @@ http://czheng.me
         var chapterArray = Object.keys(chapters);
         var col = $('#ship_displayCase_dropLocations');
         col.empty();
-        chapterArray.forEach(function(item, index){
+        chapterArray.forEach(function (item, index) {
             var li = $('<li></li>');
             li.addClass('collection-item');
             li.html('Chapter ' + item + ': ');
-            chapters[item].forEach(function(map, index){
+            chapters[item].forEach(function (map, index) {
                 // Go through each chapter and see if there is a note for the map. Add as tooltip.
                 var elementMeta = '';
-                if (('D' + item + '-' + map in shipChunk['detailedItems']) && (shipChunk['detailedItems']['D' + item + '-' + map] !== '1')){
+                if (('D' + item + '-' + map in shipChunk['detailedItems']) && (shipChunk['detailedItems']['D' + item + '-' + map] !== '1')) {
                     elementMeta += ' class="tooltipped" data-position="top" data-tooltip="' + shipChunk['detailedItems']['D' + item + '-' + map] + '">';
                 }
                 var span = $('<span' + elementMeta + '</span>');
                 map = map.replace('note', '');
-                if ((index + 1) === chapters[item].length){
+                if ((index + 1) === chapters[item].length) {
                     span.html(map);
                 }
-                else{
+                else {
                     span.html(map + ', ');
                 }
                 li.html(li.html() + span.prop('outerHTML'));
             });
             col.append(li);
         });
-        
+
         // Ship retrofit (button hide).
-        if (shipChunk['detailedItems']['Remodel'] === '1'){
+        if (shipChunk['detailedItems']['Remodel'] === '1') {
             $("#ship_displayCase_retrofit").show();
         }
-        else{
+        else {
             $("#ship_displayCase_retrofit").hide();
         }
 
         // Dynamically add tooltip call for Materialize.
         $('.tooltipped').tooltip();
-        
+
         // Force user to go to the top of page.
         window.scrollTo(0, 0);
-        
+
         // Tabs fix (the tab selector is broken)
         var tabParent = $('#ship_displayCase_tabs');
         tabParent.tabs('select', '100tabs');
@@ -886,10 +895,10 @@ http://czheng.me
         }
         localStorage.setItem('fullDataAmount', "0");
         localStorage.setItem('dataFetched', "0");
-        
+
         // Deep search for each ship, grab available stats.
         var shipNames = Object.keys(ships);
-        shipNames.forEach(function(name){
+        shipNames.forEach(function (name) {
             //var name = "Universal Bullin";
             var shipNameTag = ships[name]["pageLink"].substring(1).replace('%C3%B6', 'ö');
             localStorage.setItem('fullDataAmount', (parseInt(localStorage.getItem('fullDataAmount')) + 1) + "");
@@ -914,12 +923,12 @@ http://czheng.me
                     var currentShipAffiliation = raw[5].split("=")[1].trim();
                     // This is a quick workaround for the app in order to fix loading issue with the new characters.
                     // Essentially hard-coded solution to new wiki data format (order of data is swapped).
-                    if (["Normal", "Rare", "Elite", "Super Rare", "Ultra Rare"].indexOf(currentShipAffiliation) !== -1){
+                    if (["Normal", "Rare", "Elite", "Super Rare", "Ultra Rare"].indexOf(currentShipAffiliation) !== -1) {
                         currentShipAffiliation = raw[6].split("=")[1].trim();
                     }
 
                     for (var s in ships) {
-                        if ((ships[s]["id"] === currentShipID) && (ships[s]["affiliation"] === currentShipAffiliation)){
+                        if ((ships[s]["id"] === currentShipID) && (ships[s]["affiliation"] === currentShipAffiliation)) {
                             ships[s]["detailedItems"] = {};
                             raw.forEach(function (item) {
                                 var twig = item.split("=");
@@ -1051,14 +1060,14 @@ http://czheng.me
 
     // Makes the search results appear and disappear as search is focused.
     window.setInterval(function () {
-        
-        if (!$('#ship_displayCase').is(':visible')){
+
+        if (!$('#ship_displayCase').is(':visible')) {
             $('#mainMenuDisplay').show(); //don't call showMainMenu as it will infinitely concat more rows.
         }
-        else{
+        else {
             $('#mainMenuDisplay').hide();
         }
-            
+
         var search = $("#search");
         if (search.is(":focus") && (search.val().length > 0)) {
             $("#search_results").show();
@@ -1154,7 +1163,7 @@ http://czheng.me
                         "regular search": "Enter text and search results will appear based on ship name.",
                         "compare": "Compares named ships' stats. <a onclick='$(\"#search\").val(\"compare prinz eugen, belfast, universal bullin\");' style='cursor: pointer;'>Click for an example</a>",
                         "allsearchablecomponents (or asc)": "Gives a list of searchable keywords, with examples built in.",
-                        "update" : "Force updates the app information (if your ship data is out of date).",
+                        "update": "Force updates the app information (if your ship data is out of date).",
                         "help": "Shows all possible commands."
                     };
                     for (var name in helpData) {
@@ -1177,7 +1186,7 @@ http://czheng.me
                     });
                 }
                 else if ((omnisearch.toLowerCase() === 'update')) {
-                    localforage.clear().then(function(){
+                    localforage.clear().then(function () {
                         alert("Updating the app, please wait~");
                         location.reload();
                     });
@@ -1215,20 +1224,7 @@ http://czheng.me
             event.preventDefault();
         }
     });
-    
-    // Back button will always bring you to home (back button capture).
-    jQuery(document).ready(function($){
-        if (window.history && window.history.pushState){
-            window.history.pushState('forward', null, './#d');
-            $(window).on('popstate', function(){
-                document.title = 'AzurViewer';
-                $('#ship_displayCase').hide();
-                $('#mainMenuDisplay').show();
-                window.history.pushState('forward', null, './#d');
-            });
-        }
-    });
-    
+
     // Register all items.
     $(document).ready(function () {
         $('.collapsible').collapsible();
@@ -1236,6 +1232,15 @@ http://czheng.me
         $('#skinModal').modal();
         $('#miscInfoModal').modal();
     });
+
+    // Service worker.
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('sw.js').then(function (reg) {}, function (err) {
+                M.toast({html: 'Unable to register service worker.<br>' + err, classes: 'rounded'});
+            });
+        });
+    }
 
 </script>
 </body>
