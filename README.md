@@ -16,7 +16,7 @@ A development checkmark is available below. More features may be added in the fu
 - [x] Simple, intuitive design.
 - [x] Powerful search to find what you want.
 - [x] Easy to use app design for everyone to use.
-- [x] Cross platform.
+- [x] PWA application (works offline, installable everywhere).
 - [x] View basic ship information (name, nationality, rarity, etc).
 - [x] View ship skins.
 - [ ] View ship battle stats (firepower, retrofit, abilities, etc).
